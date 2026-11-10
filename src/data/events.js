@@ -1,3 +1,5 @@
+// News events group related articles. `date` is the event's ORIGINAL sample date; it is used only to
+// shift sample source-document dates (lib/schedule.js). Displayed publication times come from the schedule.
 // News events group related articles. `comparison` holds editor-written summaries for each
 // of the six comparison dimensions. Per-outlet detail is derived from the article records.
 export const TOPICS = ['Elections', 'International Affairs', 'Economy', 'Technology', 'Climate', 'National Security', 'Energy & Infrastructure'];

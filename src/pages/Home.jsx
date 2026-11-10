@@ -1,29 +1,32 @@
 import { useMemo } from 'react';
 import { listEvents } from '../services/api.js';
 import { useAsync } from '../lib/useAsync.js';
-import { getArticle, articles as allArticles } from '../data/articles.js';
+import { articles as allArticles, articlesForEvent } from '../data/articles.js';
 import { getEvent, featuredEvent, TOPICS } from '../data/events.js';
 import { publications } from '../data/publications.js';
-import { activity, RATING_LABELS, REASONS } from '../data/community.js';
-import { aggregate, meanLabel } from '../lib/stats.js';
-import { fmtDate, relTime, num } from '../lib/format.js';
+import { optionForPoints } from '../data/ratingScale.js';
+import { communityAt, simulatedActivity } from '../services/community.js';
+import { windowFor, isPublished } from '../lib/schedule.js';
+import { HOUR } from '../lib/clock.js';
+import { fmtRelative, num } from '../lib/format.js';
 import { slugify } from '../lib/text.js';
 import { Link } from '../state/router.jsx';
 import { useStore } from '../state/store.jsx';
 import { SearchBox } from '../components/Shell.jsx';
 import { EventCard } from '../components/Cards.jsx';
+import { ScoreBadge } from '../components/Rating.jsx';
+import { Countdown } from '../components/Status.jsx';
 import { Headline, Icon, SampleTag, SectionHead, Skeleton } from '../components/ui.jsx';
 
 const JOURNEY = [
   { key: 'searched', label: 'Search for a news event', to: 'explore', param: 'permitting' },
-  { key: 'searched', label: 'See every publication covering it', to: 'explore', param: 'permitting', alias: true },
-  { key: 'compared', label: 'Compare headlines and framing', to: 'compare', param: 'permitting-act' },
-  { key: 'opened', label: 'Open an individual article', to: 'article', param: 'fox-permitting' },
-  { key: 'sources', label: 'Investigate its sources', to: 'sources', param: 'fox-permitting' },
-  { key: 'rated', label: 'Evaluate its headline', to: 'article', param: 'fox-permitting' },
-  { key: 'explained', label: 'Explain your reasoning', to: 'article', param: 'fox-permitting' },
-  { key: 'contributed', label: 'Add to community statistics', to: 'ratings' },
-  { key: 'profileViewed', label: 'See your profile and reputation update', to: 'profile' },
+  { key: 'rated', label: 'Read an article and rate it blind', to: 'ratings' },
+  { key: 'rated', label: 'See the reveal: score, outlet and sources', to: 'ratings', alias: true },
+  { key: 'ratedThree', label: 'Rate three articles today', to: 'ratings' },
+  { key: 'compared', label: 'Compare how outlets covered the event', to: 'compare', param: 'permitting-act' },
+  { key: 'sources', label: 'Investigate an article’s sources', to: 'sources', param: 'permitting-act' },
+  { key: 'browsed', label: 'Switch to Browse Mode', to: 'explore' },
+  { key: 'profileViewed', label: 'Check your Crowd Alignment rank', to: 'profile' },
 ];
 
 // Simulated attention index (share of sample-week coverage) for trending topics.
@@ -37,28 +40,45 @@ function Spark({ data }) {
 }
 
 export default function Home() {
-  const { data: events, loading } = useAsync(listEvents, []);
-  const { journey, evaluations, evalFor, user } = useStore();
+  const { now, vis, journey, ratings, mode, boundaryKey } = useStore();
+  const { data: events } = useAsync(() => listEvents({ now }), [boundaryKey]);
   const done = JOURNEY.filter((s) => journey[s.key]).length;
+  const today = new Date(now).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
-  const contrasts = useMemo(() => [
-    { eventId: 'permitting-act', ids: ['ap-permitting', 'fox-permitting', 'cnn-permitting'] },
-    { eventId: 'water-cyber', ids: ['ap-water', 'cnn-water', 'nyt-water'] },
-    { eventId: 'methane-pact', ids: ['bbc-methane', 'guardian-methane', 'wsj-methane'] },
-  ], []);
+  const rateable = allArticles.map((a) => ({ a, v: vis(a) })).filter((x) => x.v.canRate).sort((x, y) => x.v.closesAt - y.v.closesAt);
 
-  const myRecent = evaluations.filter((e) => !e.seeded).slice(0, 2);
-  const today = new Date('2026-11-01T12:00:00Z').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  // Contrasts only from events with every article published and revealed, so nothing sealed leaks.
+  const contrasts = useMemo(() => {
+    const out = [];
+    for (const ev of (events || [])) {
+      const list = articlesForEvent(ev.id);
+      if (!list.every((a) => isPublished(a.id, now) && vis(a).revealed)) continue;
+      const scored = list.map((a) => ({ a, c: communityAt(a.id, now, vis(a).rating) })).filter((x) => x.c.mean !== null).sort((x, y) => y.c.mean - x.c.mean);
+      if (scored.length < 2) continue;
+      out.push({ ev, picks: [scored[0], scored[Math.floor(scored.length / 2)], scored[scored.length - 1]].filter((x, i, arr) => arr.indexOf(x) === i) });
+    }
+    return out.slice(0, 3);
+  }, [events, now, vis]);
+
+  const recentClosed = allArticles.map((a) => ({ a, v: vis(a) })).filter((x) => x.v.status === 'closed')
+    .sort((x, y) => y.v.closesAt - x.v.closesAt).slice(0, 5);
+  const myRecent = ratings.slice(0, 3);
+  const lastHour = simulatedActivity(now - HOUR, now);
+
+  const featuredList = articlesForEvent(featuredEvent.id).filter((a) => isPublished(a.id, now));
+  const featuredSealed = featuredList.filter((a) => vis(a).sealed).length;
+  const featuredSources = new Set(featuredList.flatMap((a) => a.sourceUses.map((u) => u.id))).size;
+  const featuredClaims = new Set(featuredList.flatMap((a) => a.claims)).size;
 
   return (
     <div className="page home">
       <section className="hero">
         <div className="hero-main">
           <div className="dateline">{today} · <SampleTag>Sample edition</SampleTag></div>
-          <h1 className="hero-title">Same event. Different stories.<br /><em>See how the news is framed.</em></h1>
-          <p className="hero-sub">Compare how news organizations cover the same events, trace claims back to their original sources, and rate the framing of individual headlines with other careful readers.</p>
+          <h1 className="hero-title">Judge the story first.<br /><em>Then see who wrote it.</em></h1>
+          <p className="hero-sub">Rate news articles blind, without knowing the outlet, its sources or what other readers think. Then the reveal: the community score, the publication, and how other outlets covered the same event.</p>
           <SearchBox size="lg" />
-          <p className="small muted hero-try">Try: <Link to="explore" param="permitting">permitting bill</Link> · <Link to="explore" param="cybersecurity">cybersecurity</Link> · <Link to="explore" param="federal-reserve">Federal Reserve</Link> · <Link to="explore" param="whitfield">Dana Whitfield</Link></p>
+          <p className="small muted hero-try">Try: <Link to="explore" param="permitting">permitting bill</Link> · <Link to="explore" param="methane">methane</Link> · <Link to="explore" param="chips">AI chips</Link> · <Link to="explore" param="federal-reserve">Federal Reserve</Link></p>
         </div>
         <aside className="journey" aria-label="Guided walkthrough">
           <div className="journey-head">
@@ -80,24 +100,45 @@ export default function Home() {
       </section>
 
       <section className="block">
-        <SectionHead kicker="Top stories" title="Events with the widest coverage" action={<Link to="compare" className="textlink">All events <Icon name="arrow" size={13} /></Link>}>
-          Each event groups reports from several publications. Open one to compare them side by side.
+        <SectionHead kicker={mode === 'browse' ? 'Browse Mode' : 'Open for blind rating'} title={mode === 'browse' ? 'Rating is paused until tomorrow' : 'Articles waiting for your rating'}
+          action={<Link to="ratings" className="textlink">All community scores <Icon name="arrow" size={13} /></Link>}>
+          {mode === 'browse' ? 'You can explore every article’s live results. New ratings open again at local midnight.' : 'Each article is open for 24 hours. You’ll see only the headline and text until you rate it.'}
         </SectionHead>
-        {loading ? (
+        {mode === 'rating' && (rateable.length ? (
+          <ul className="open-list">
+            {rateable.slice(0, 6).map(({ a, v }) => (
+              <li key={a.id}>
+                <span className="pubmark pubmark-sm pubmark-sealed" aria-hidden="true">?</span>
+                <div className="ol-main">
+                  <Link to="article" param={a.id} className="ol-hl"><Headline text={a.headline} /></Link>
+                  <span className="tiny muted">{getEvent(a.eventId).topic} · closes in <Countdown until={v.closesAt} /></span>
+                </div>
+                <Link to="article" param={a.id} className="btn btn-primary btn-sm">Rate blind</Link>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="small muted">No articles are open for you to rate right now. New sample articles are published over the course of the timeline.</p>)}
+      </section>
+
+      <section className="block">
+        <SectionHead kicker="Top stories" title="Events with the widest coverage" action={<Link to="compare" className="textlink">All events <Icon name="arrow" size={13} /></Link>}>
+          Each event groups reports from several publications. Outlets stay hidden on articles you haven’t rated yet.
+        </SectionHead>
+        {!events ? (
           <div className="top-grid"><Skeleton image lines={4} /><Skeleton image /><Skeleton image /><Skeleton image /></div>
         ) : (
           <div className="top-grid">
-            {[events.find((e) => e.featured), ...events.filter((e) => !e.featured).slice(0, 4)].map((e, i) => <EventCard key={e.id} event={e} articles={e.articles} lead={i === 0} />)}
+            {[events.find((e) => e.featured), ...events.filter((e) => !e.featured).slice(0, 4)].filter(Boolean).map((e, i) => <EventCard key={e.id} event={e} articles={e.articles} lead={i === 0} />)}
           </div>
         )}
       </section>
 
       <section className="block">
-        <SectionHead kicker="Trending topics" title="Where attention is going" >Share of sample coverage over the past seven days.</SectionHead>
+        <SectionHead kicker="Trending topics" title="Where attention is going">Share of sample coverage over the past seven days.</SectionHead>
         <div className="topics">
           {TOPICS.map((t) => {
             const evs = (events || []).filter((e) => e.topic === t);
-            const n = allArticles.filter((a) => getEvent(a.eventId).topic === t).length;
+            const n = allArticles.filter((a) => getEvent(a.eventId).topic === t && isPublished(a.id, now)).length;
             const d = TREND[t]; const ch = d[d.length - 1] - d[d.length - 2];
             return (
               <Link key={t} to="explore" param={slugify(t)} className="topic">
@@ -112,63 +153,55 @@ export default function Home() {
       </section>
 
       <section className="block">
-        <SectionHead kicker="Coverage differences" title="One event, contrasting headlines">Highlighted words are the wording choices readers discuss most. Ratings come from community evaluations of each headline, not from the outlet’s reputation.</SectionHead>
-        <div className="contrasts">
-          {contrasts.map((c) => {
-            const ev = getEvent(c.eventId);
-            return (
-              <article key={c.eventId} className="contrast">
-                <div className="contrast-head">
-                  <div className="kicker">{ev.topic}</div>
-                  <h3 className="contrast-title">{ev.title}</h3>
-                </div>
+        <SectionHead kicker="Coverage differences" title="One event, contrasting headlines">Highest, middle and lowest community scores within events whose ratings you can see. Highlighted words are the wording choices discussed in the analysis.</SectionHead>
+        {contrasts.length ? (
+          <div className="contrasts">
+            {contrasts.map(({ ev, picks }) => (
+              <article key={ev.id} className="contrast">
+                <div className="contrast-head"><div className="kicker">{ev.topic}</div><h3 className="contrast-title">{ev.title}</h3></div>
                 <ul className="contrast-list">
-                  {c.ids.map((id) => {
-                    const a = getArticle(id); const agg = aggregate(a, evalFor(id));
-                    return (
-                      <li key={id}>
-                        <span className="pubmark pubmark-sm">{publications[a.pub].short}</span>
-                        <div>
-                          <Link to="article" param={id} className="contrast-hl"><Headline text={a.headline} highlight /></Link>
-                          <div className="small muted">{publications[a.pub].name} · <span className={`mean-chip m${Math.round(agg.mean)}`}>{meanLabel(agg.mean)}</span> · {num(agg.n)} ratings</div>
-                        </div>
-                      </li>
-                    );
-                  })}
+                  {picks.map(({ a, c }) => (
+                    <li key={a.id}>
+                      <span className="pubmark pubmark-sm">{publications[a.pub].short}</span>
+                      <div>
+                        <Link to="article" param={a.id} className="contrast-hl"><Headline text={a.headline} highlight /></Link>
+                        <div className="small muted row-gap">{publications[a.pub].name} <ScoreBadge score={c.mean} n={c.n} final={vis(a).status === 'closed'} /></div>
+                      </div>
+                    </li>
+                  ))}
                 </ul>
                 <Link to="compare" param={ev.id} className="btn btn-ghost btn-sm"><Icon name="compare" size={14} /> Compare all coverage</Link>
               </article>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : <p className="small muted">Contrasts appear once an event’s articles are all closed or rated by you.</p>}
       </section>
 
       <section className="block two-col">
         <div>
-          <SectionHead kicker="Community activity" title="Recently evaluated headlines" />
+          <SectionHead kicker="Community activity" title="Recent results" />
+          <p className="small live-line"><span className="pulse" aria-hidden="true" /> <strong className="tabular">{num(lastHour)}</strong> ratings submitted by simulated participants in the past hour <SampleTag>Simulated</SampleTag></p>
           <ul className="feed">
-            {myRecent.map((e) => {
-              const a = getArticle(e.articleId);
+            {myRecent.map((r) => {
+              const a = allArticles.find((x) => x.id === r.articleId); const o = optionForPoints(r.points); const v = vis(a);
               return (
-                <li key={e.id} className="feed-item feed-you">
-                  <span className={`feed-rating r${e.rating}`}>{RATING_LABELS[e.rating]}</span>
+                <li key={r.articleId} className="feed-item feed-you">
+                  <span className={`feed-rating r${[100, 75, 50, 25, 0].indexOf(r.points)}`}>{o.short} · {r.points}</span>
                   <div>
-                    <div className="small"><strong>{user.username}</strong> (you) · just now</div>
+                    <div className="small"><strong>You</strong> · {fmtRelative(new Date(r.submittedAt).getTime(), now)} · {v.status === 'closed' ? 'closed' : <>closes in <Countdown until={v.closesAt} /></>}</div>
                     <Link to="article" param={a.id} className="feed-hl"><Headline text={a.headline} /></Link>
-                    {e.text && <p className="feed-note">“{e.text}”</p>}
                   </div>
                 </li>
               );
             })}
-            {activity.map((x, i) => {
-              const a = getArticle(x.articleId);
+            {recentClosed.map(({ a, v }) => {
+              const c = communityAt(a.id, now, v.rating);
               return (
-                <li key={i} className="feed-item">
-                  <span className={`feed-rating r${x.rating}`}>{RATING_LABELS[x.rating]}</span>
+                <li key={a.id} className="feed-item">
+                  <ScoreBadge score={c.mean} n={c.n} final />
                   <div>
-                    <div className="small"><strong>{x.user}</strong> · {x.level} · {relTime(x.mins)}{x.reason && <> · <span className="muted">{REASONS[x.reason]}</span></>}</div>
+                    <div className="small"><strong>{publications[a.pub].name}</strong> · closed {fmtRelative(windowFor(a.id).closesAt, now)}</div>
                     <Link to="article" param={a.id} className="feed-hl"><Headline text={a.headline} /></Link>
-                    <p className="feed-note">“{x.note}”</p>
                   </div>
                 </li>
               );
@@ -178,18 +211,25 @@ export default function Home() {
         <aside className="featured-aside">
           <div className="kicker">Featured analysis</div>
           <h3 className="fa-title">{featuredEvent.title}</h3>
-          <p className="small">{featuredEvent.comparison.headline}</p>
-          <dl className="fa-stats">
-            <div><dt>Outlets compared</dt><dd className="tabular">6</dd></div>
-            <div><dt>Distinct sources</dt><dd className="tabular">15</dd></div>
-            <div><dt>Claims traced</dt><dd className="tabular">13</dd></div>
-          </dl>
-          <p className="small muted">Four of six outlets repeat one figure that traces back to a single press release.</p>
-          <div className="fa-actions">
-            <Link to="compare" param={featuredEvent.id} className="btn btn-primary btn-sm">Open comparison</Link>
-            <Link to="sources" param="permitting-act" className="btn btn-ghost btn-sm">Source map</Link>
-          </div>
-          <p className="tiny muted">Published {fmtDate(featuredEvent.date)} · sample event</p>
+          {featuredSealed > 0 ? (
+            <>
+              <p className="small">{featuredSealed} of {featuredList.length} articles about this event are waiting for your blind rating. The side-by-side comparison of their framing unlocks once you’ve rated them or their windows close.</p>
+              <div className="fa-actions"><Link to="compare" param={featuredEvent.id} className="btn btn-primary btn-sm">Start rating</Link></div>
+            </>
+          ) : (
+            <>
+              <p className="small">{featuredEvent.comparison.headline}</p>
+              <dl className="fa-stats">
+                <div><dt>Outlets compared</dt><dd className="tabular">{featuredList.length}</dd></div>
+                <div><dt>Distinct sources</dt><dd className="tabular">{featuredSources}</dd></div>
+                <div><dt>Claims traced</dt><dd className="tabular">{featuredClaims}</dd></div>
+              </dl>
+              <div className="fa-actions">
+                <Link to="compare" param={featuredEvent.id} className="btn btn-primary btn-sm">Open comparison</Link>
+                <Link to="sources" param={featuredEvent.id} className="btn btn-ghost btn-sm">Source map</Link>
+              </div>
+            </>
+          )}
         </aside>
       </section>
     </div>

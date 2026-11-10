@@ -1,23 +1,27 @@
-import { RATING_LABELS } from '../data/community.js';
-import { pct } from '../lib/format.js';
+// Charts for the five-option scale. Tone classes r0…r4 map to RATING_OPTIONS order
+// (r0 = Neutral/Factual 100 … r4 = Nonfactual 0) and use the --r0…--r4 color tokens.
+import { RATING_OPTIONS, indexForPoints, nearestOption, toneForScore } from '../data/ratingScale.js';
+import { pct, num } from '../lib/format.js';
 
-export function DistributionBar({ dist, compact = false, highlight = null }) {
+export function DistributionBar({ dist, compact = false, highlightPoints = null }) {
   const n = dist.reduce((a, b) => a + b, 0) || 1;
+  const hi = highlightPoints === null ? -1 : indexForPoints(highlightPoints);
   return (
     <div className={`dist ${compact ? 'dist-compact' : ''}`}>
-      <div className="dist-bar" role="img" aria-label={dist.map((c, i) => `${RATING_LABELS[i]} ${pct(c, n)}%`).join(', ')}>
+      <div className="dist-bar" role="img" aria-label={dist.map((c, i) => `${RATING_OPTIONS[i].label} ${pct(c, n)}%`).join(', ')}>
         {dist.map((c, i) => (
-          <span key={i} className={`dist-seg r${i} ${highlight === i ? 'is-you' : ''}`} style={{ width: `${(c / n) * 100}%` }} title={`${RATING_LABELS[i]}: ${pct(c, n)}%`} />
+          <span key={i} className={`dist-seg r${i} ${hi === i ? 'is-you' : ''}`} style={{ width: `${(c / n) * 100}%` }} title={`${RATING_OPTIONS[i].label}: ${pct(c, n)}%`} />
         ))}
       </div>
       {!compact && (
         <ul className="dist-legend">
           {dist.map((c, i) => (
-            <li key={i} className={highlight === i ? 'is-you' : ''}>
+            <li key={i} className={hi === i ? 'is-you' : ''}>
               <span className={`swatch r${i}`} />
-              <span className="dl-label">{RATING_LABELS[i]}</span>
-              <span className="dl-val">{pct(c, n)}%</span>
-              <span className="dl-n">{c.toLocaleString()}</span>
+              <span className="dl-label">{RATING_OPTIONS[i].label}{hi === i && <em className="you-chip">you</em>}</span>
+              <span className="dl-pts tabular">{RATING_OPTIONS[i].points}</span>
+              <span className="dl-val tabular">{pct(c, n)}%</span>
+              <span className="dl-n tabular">{num(c)}</span>
             </li>
           ))}
         </ul>
@@ -26,32 +30,30 @@ export function DistributionBar({ dist, compact = false, highlight = null }) {
   );
 }
 
-/** 0–3 scale with community mean and, optionally, the user's own rating. */
-export function ScaleMarker({ mean, you = null, spread = null }) {
-  const x = (v) => `${(v / 3) * 100}%`;
+/** 0–100 axis with the community score and (optionally) your rating. */
+export function ScoreScale({ score, you = null }) {
+  const x = (v) => `${v}%`;
   return (
     <div className="scale">
       <div className="scale-track">
-        {[0, 1, 2, 3].map((i) => <span key={i} className="scale-tick" style={{ left: x(i) }} />)}
-        {spread && <span className="scale-spread" style={{ left: x(spread[0]), width: `${((spread[1] - spread[0]) / 3) * 100}%` }} />}
-        <span className="scale-mean" style={{ left: x(mean) }} title={`Community mean ${mean.toFixed(2)}`}><span>Community {mean.toFixed(2)}</span></span>
-        {you !== null && <span className="scale-you" style={{ left: x(you) }} title="Your rating"><span>You</span></span>}
+        {[0, 25, 50, 75, 100].map((v) => <span key={v} className="scale-tick" style={{ left: x(v) }} />)}
+        {score !== null && <span className="scale-mean" style={{ left: x(score) }} title={`Community score ${Math.round(score)}`}><span>Community {Math.round(score)}</span></span>}
+        {you !== null && <span className="scale-you" style={{ left: x(you) }} title={`Your rating ${you}`}><span>You {you}</span></span>}
       </div>
-      <div className="scale-labels">{['Neutral', 'Slight', 'Moderate', 'Strong'].map((l) => <span key={l}>{l}</span>)}</div>
+      <div className="scale-labels"><span>0 Nonfactual</span><span>50 Biased</span><span>100 Neutral</span></div>
     </div>
   );
 }
 
-export function ReasonBars({ reasons, mine = [], limit = 5 }) {
-  const max = Math.max(...reasons.map((r) => r.count), 1);
+/** Compact "61/100" badge colored by the nearest category. */
+export function ScoreBadge({ score, n = null, final = false }) {
+  if (score === null || score === undefined) return <span className="score-badge empty">No ratings yet</span>;
+  const opt = nearestOption(score);
   return (
-    <ul className="reason-bars">
-      {reasons.slice(0, limit).map((r) => (
-        <li key={r.key} className={mine.includes(r.key) ? 'is-you' : ''}>
-          <div className="rb-top"><span>{r.label}{mine.includes(r.key) && <em className="you-chip">you</em>}</span><span className="tabular">{Math.round(r.share * 100)}%</span></div>
-          <div className="rb-track"><span style={{ width: `${(r.count / max) * 100}%` }} /></div>
-        </li>
-      ))}
-    </ul>
+    <span className={`score-badge r${toneForScore(score)}`} title={`Community score ${Math.round(score)}/100, closest to “${opt.label}”. Community perception, not a fact-check.`}>
+      <span className="sb-num tabular">{Math.round(score)}</span><span className="sb-den">/100</span>
+      <span className="sb-label">{opt.short}</span>
+      {n !== null && <span className="sb-n tabular">{num(n)} ratings{final ? ', final' : ''}</span>}
+    </span>
   );
 }

@@ -4,25 +4,30 @@ import { getArticle, articlesForEvent } from '../data/articles.js';
 import { publications } from '../data/publications.js';
 import { getSource, SOURCE_TYPES } from '../data/sources.js';
 import { getClaim } from '../data/claims.js';
-import { fmtDate } from '../lib/format.js';
+import { fmtDate, fmtDateTime } from '../lib/format.js';
+import { shiftedSourceDate, eventPublishedAt, isPublished } from '../lib/schedule.js';
 import { Link, useRouter } from '../state/router.jsx';
 import { useStore } from '../state/store.jsx';
 import { ArticleSourceMap, EventSourceMap } from '../components/SourceMap.jsx';
 import { SourceDrawer, TypeBadge, UseBadge, USE_CLASS } from '../components/SourceParts.jsx';
-import { Headline, Icon, SampleTag, SectionHead } from '../components/ui.jsx';
+import { EmptyState, Headline, Icon, SampleTag, SectionHead } from '../components/ui.jsx';
 
 export default function SourceExplorer() {
   const { param, navigate } = useRouter();
-  const { markJourney } = useStore();
-  const fromArticle = getArticle(param);
-  const eventId = fromArticle ? fromArticle.eventId : getEvent(param) ? param : 'permitting-act';
+  const { markJourney, vis, now } = useStore();
+  // A sealed article can't be focused: its sources would reveal it. Fall back to its event.
+  const paramArticle = getArticle(param);
+  const fromArticle = paramArticle && vis(paramArticle).revealed ? paramArticle : null;
+  const eventId = paramArticle ? paramArticle.eventId : getEvent(param) ? param : 'permitting-act';
   const event = getEvent(eventId);
-  const list = articlesForEvent(eventId);
+  const published = articlesForEvent(eventId).filter((a) => isPublished(a.id, now));
+  const list = published.filter((a) => vis(a).revealed);
+  const hiddenCount = published.length - list.length;
   const [focus, setFocus] = useState(fromArticle ? fromArticle.id : 'all');
   const [drawer, setDrawer] = useState(null);
   const [typeFilter, setTypeFilter] = useState('');
   useEffect(() => { setFocus(fromArticle ? fromArticle.id : 'all'); }, [param]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { markJourney('sources'); }, [markJourney]);
+  useEffect(() => { if (list.length) markJourney('sources'); }, [list.length, markJourney]);
 
   const article = focus === 'all' ? null : getArticle(focus);
   const usage = useMemo(() => {
@@ -51,7 +56,7 @@ export default function SourceExplorer() {
         <div className="picker">
           <label className="select-wrap"><span className="small muted">Event</span>
             <select id="se-event" value={eventId} onChange={(e) => navigate('sources', e.target.value)}>
-              {events.map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
+              {events.filter((e) => articlesForEvent(e.id).some((a) => isPublished(a.id, now))).map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
             </select>
           </label>
           <div className="seg seg-wrap" role="group" aria-label="Focus">
@@ -59,13 +64,16 @@ export default function SourceExplorer() {
             {list.map((a) => <button key={a.id} className={focus === a.id ? 'on' : ''} onClick={() => setFocus(a.id)}>{publications[a.pub].short}</button>)}
           </div>
         </div>
+        {hiddenCount > 0 && <p className="small sealed-note"><Icon name="lock" size={12} /> {hiddenCount} article{hiddenCount === 1 ? '' : 's'} in this event {hiddenCount === 1 ? 'is' : 'are'} left out until you rate {hiddenCount === 1 ? 'it' : 'them'} or {hiddenCount === 1 ? 'its window closes' : 'their windows close'}. Showing their sources would reveal who wrote them.</p>}
       </header>
 
       <section className="block">
         <SectionHead kicker="Source map" title={article ? <>{publications[article.pub].name}: claims and sources</> : 'Which sources each outlet relies on'} action={<SampleTag />}>
           {article ? <><Headline text={article.headline} /> · Select a claim to see its evidence, or a source to see its details.</> : 'Thicker accent lines mark sources that three or more outlets share. Shared reliance is common and often legitimate, but it means repetition is not independent confirmation.'}
         </SectionHead>
-        {article
+        {!list.length ? (
+          <EmptyState title="No revealed coverage yet" action={<Link to="compare" param={eventId} className="btn btn-primary btn-sm">Rate this event’s articles</Link>}>Sources appear here once you’ve rated an article from this event, or once its rating window closes.</EmptyState>
+        ) : article
           ? <ArticleSourceMap article={article} onSource={(sid) => setDrawer({ sid, use: article.sourceUses.find((u) => u.id === sid) })} onClaim={() => navigate('article', article.id)} />
           : <EventSourceMap articles={list} onSource={(sid) => setDrawer({ sid })} onArticle={(id) => setFocus(id)} />}
       </section>
@@ -103,7 +111,7 @@ export default function SourceExplorer() {
             return (
               <li key={s.id}>
                 <button className="source-row" onClick={() => setDrawer({ sid: s.id, use: mine?.u })}>
-                  <span className="sr-main"><strong>{s.name}</strong><span className="small muted">{s.publisher} · {fmtDate(s.date)}</span>
+                  <span className="sr-main"><strong>{s.name}</strong><span className="small muted">{s.publisher} · {fmtDate(shiftedSourceDate(s.id, s.date))}</span>
                     {mine ? <span className="small">{mine.u.usage}</span> : <span className="small">{s.description}</span>}</span>
                   <span className="sr-badges">
                     <TypeBadge type={s.type} />
@@ -115,7 +123,7 @@ export default function SourceExplorer() {
           })}
           {!sourceRows.length && <li className="small muted">No sources of this type.</li>}
         </ul>
-        <p className="tiny muted">A prestigious institution can still be wrong on a particular claim, and an obscure source can be right. Judge each source by what it shows and how the article uses it. {event && <>Event date: {fmtDate(event.date)}.</>} <Link to="compare" param={eventId}>Back to coverage comparison <Icon name="arrow" size={11} /></Link></p>
+        <p className="tiny muted">A prestigious institution can still be wrong on a particular claim, and an obscure source can be right. Judge each source by what it shows and how the article uses it. {event && <>Event published {fmtDateTime(eventPublishedAt(event.id))}.</>} <Link to="compare" param={eventId}>Back to coverage comparison <Icon name="arrow" size={11} /></Link></p>
       </section>
       <SourceDrawer sourceId={drawer?.sid} use={drawer?.use} onClose={() => setDrawer(null)} />
     </div>

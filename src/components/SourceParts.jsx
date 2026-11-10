@@ -4,6 +4,8 @@ import { CLAIM_KIND, CLAIM_STATUS } from '../data/claims.js';
 import { articles } from '../data/articles.js';
 import { publications } from '../data/publications.js';
 import { fmtDate } from '../lib/format.js';
+import { shiftedSourceDate } from '../lib/schedule.js';
+import { useStore } from '../state/store.jsx';
 import { Link } from '../state/router.jsx';
 import { Icon } from './ui.jsx';
 
@@ -27,6 +29,7 @@ export function TypeBadge({ type }) {
 export const citingArticles = (sourceId) => articles.filter((a) => a.sourceUses.some((u) => u.id === sourceId));
 
 export function SourceDrawer({ sourceId, use, onClose }) {
+  const { vis } = useStore();
   const s = sourceId ? getSource(sourceId) : null;
   useEffect(() => {
     if (!s) return;
@@ -35,7 +38,8 @@ export function SourceDrawer({ sourceId, use, onClose }) {
     return () => window.removeEventListener('keydown', k);
   }, [s, onClose]);
   if (!s) return null;
-  const citing = citingArticles(s.id);
+  // Only revealed articles are listed: naming a sealed article here would reveal its sources.
+  const citing = citingArticles(s.id).filter((a) => vis(a).revealed);
   return (
     <div className="drawer-wrap" onClick={onClose}>
       <aside className="drawer" role="dialog" aria-modal="true" aria-label={s.name} onClick={(e) => e.stopPropagation()}>
@@ -44,14 +48,14 @@ export function SourceDrawer({ sourceId, use, onClose }) {
         <h3 className="drawer-title">{s.name}</h3>
         <dl className="kv">
           <dt>Publisher / institution</dt><dd>{s.publisher}</dd>
-          <dt>Date</dt><dd>{fmtDate(s.date)}</dd>
+          <dt>Date</dt><dd>{fmtDate(shiftedSourceDate(s.id, s.date))}</dd>
           <dt>Source type</dt><dd><TypeBadge type={s.type} /></dd>
           {use && <><dt>How this article uses it</dt><dd><UseBadge cls={use.cls} /><p className="drawer-use">{use.usage}</p></dd></>}
         </dl>
         <p className="drawer-desc">{s.description}</p>
         {s.type === 'anonymous' && <p className="callout callout-warn small">Anonymous sources can be legitimate, but readers can’t assess their position or motives. When several outlets cite an unnamed official, that doesn’t mean they confirmed the claim independently.</p>}
         {s.type === 'study' && <p className="callout small">Check who funded the study and whether it was peer reviewed. An institution’s reputation doesn’t prove any single finding.</p>}
-        <h4 className="mini-h">Cited by {citing.length} sample article{citing.length === 1 ? '' : 's'}</h4>
+        <h4 className="mini-h">Cited by {citing.length} revealed sample article{citing.length === 1 ? '' : 's'}</h4>
         <ul className="drawer-cites">
           {citing.map((a) => {
             const u = a.sourceUses.find((x) => x.id === s.id);

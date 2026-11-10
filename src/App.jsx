@@ -2,6 +2,7 @@ import { RouterProvider, useRouter } from './state/router.jsx';
 import { StoreProvider } from './state/store.jsx';
 import { Footer, NavBar, SampleBanner } from './components/Shell.jsx';
 import { Toasts } from './components/ui.jsx';
+import { ModeBar } from './components/Mode.jsx';
 import Home from './pages/Home.jsx';
 import Explore from './pages/Explore.jsx';
 import Compare from './pages/Compare.jsx';
@@ -25,6 +26,7 @@ export default function App() {
       <StoreProvider>
         <a href="#main" className="skip">Skip to content</a>
         <NavBar />
+        <ModeBar />
         <SampleBanner />
         <Routes />
         <Footer />

@@ -35,7 +35,8 @@ export function SearchBox({ initial = '', size = 'md', autoFocus = false, onSubm
 
 export function NavBar() {
   const { page } = useRouter();
-  const { reputation, user } = useStore();
+  const { alignment, user } = useStore();
+  const ranked = alignment.status !== 'unranked';
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [page]);
   return (
@@ -46,9 +47,9 @@ export function NavBar() {
           <span className="brand-word"><span className="brand-the">The</span> Media Lens</span>
         </Link>
         <div className="topbar-search"><SearchBox /></div>
-        <Link to="profile" className="userchip" title="Your credibility score">
-          <span className="userchip-score tabular">{reputation.score}</span>
-          <span className="userchip-name">{user.username}<small>{reputation.level.name}</small></span>
+        <Link to="profile" className="userchip" title={ranked ? `Crowd Alignment percentile: ${Math.round(alignment.percentile)}` : 'Unranked: rate articles and wait for them to close'}>
+          <span className="userchip-score tabular">{ranked ? Math.round(alignment.percentile) : '—'}</span>
+          <span className="userchip-name">{user.username}<small>{ranked ? `${alignment.tier.name}${alignment.status === 'provisional' ? ' (provisional)' : ''}` : 'Unranked'}</small></span>
         </Link>
         <button className="icon-btn menu-btn" aria-expanded={open} aria-controls="mainnav" aria-label="Menu" onClick={() => setOpen((o) => !o)}><Icon name={open ? 'close' : 'menu'} size={20} /></button>
       </div>
@@ -69,7 +70,7 @@ export function SampleBanner() {
     <div className="sample-banner" role="note">
       <div className="sample-banner-inner">
         <Icon name="info" size={15} />
-        <p><strong>Prototype with sample content.</strong> All headlines, articles, sources and community ratings are hypothetical and written for demonstration. They are not real reporting by the publications named, and nothing has been independently fact-checked. <Link to="methods">How this works</Link></p>
+        <p><strong>Prototype with sample content.</strong> All headlines, articles and sources are hypothetical, and other participants and their ratings are simulated. Nothing here is real reporting by the publications named, and nothing has been independently fact-checked. <Link to="methods">How this works</Link></p>
         <button className="icon-btn" aria-label="Dismiss notice" onClick={() => { setHide(true); try { sessionStorage.setItem('ml-banner', '1'); } catch { /* ignore */ } }}><Icon name="close" size={14} /></button>
       </div>
     </div>
@@ -89,7 +90,7 @@ export function Footer() {
           <div><h4>Participate</h4><Link to="ratings">Bias Ratings</Link><Link to="profile">My Profile</Link><Link to="methods">Methods &amp; limitations</Link></div>
         </div>
       </div>
-      <div className="footer-base small muted">Ratings describe individual articles’ language and sourcing. The Media Lens does not rate publications as a whole.</div>
+      <div className="footer-base small muted">Community scores are averages of readers’ perceptions of individual articles. They are not fact-checks, and The Media Lens does not rate publications as a whole.</div>
     </footer>
   );
 }

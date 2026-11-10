@@ -1,32 +1,37 @@
+// Bias Ratings: community scores (out of 100) for every published article, the spread of
+// article scores per publication, and a queue for rating blind. Sealed articles never show
+// their outlet or score here, and publication filters/sorts skip them.
 import { useMemo, useState } from 'react';
 import { articles } from '../data/articles.js';
 import { getEvent, TOPICS } from '../data/events.js';
 import { publications, pubList } from '../data/publications.js';
-import { RATING_LABELS } from '../data/community.js';
-import { aggregate, meanLabel } from '../lib/stats.js';
+import { RATING_OPTIONS, optionForPoints } from '../data/ratingScale.js';
+import { communityAt, SIM_PARTICIPANTS } from '../services/community.js';
 import { num } from '../lib/format.js';
+import { plainHeadline } from '../lib/text.js';
 import { Link } from '../state/router.jsx';
 import { useStore } from '../state/store.jsx';
-import { DistributionBar } from '../components/Rating.jsx';
-import EvaluationPanel from '../components/EvaluationPanel.jsx';
+import { DistributionBar, ScoreBadge } from '../components/Rating.jsx';
+import RatingPanel, { useReveal, shown } from '../components/RatingPanel.jsx';
+import { SealedPub, StatusBadge } from '../components/Status.jsx';
 import { EmptyState, Headline, Icon, SampleTag, Tabs } from '../components/ui.jsx';
-import { plainHeadline } from '../lib/text.js';
+
+const hash = (s) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 3);
 
 export default function BiasRatings() {
-  const [tab, setTab] = useState('headlines');
-  const { evaluations } = useStore();
-  const total = articles.reduce((s, a) => s + a.community.dist.reduce((x, y) => x + y, 0), 0) + evaluations.filter((e) => !e.seeded).length;
+  const { mode } = useStore();
+  const [tab, setTab] = useState(mode === 'rating' ? 'queue' : 'scores');
   return (
     <div className="page">
       <header className="page-head">
         <div className="kicker">Bias Ratings</div>
-        <h1 className="page-title">Community ratings of individual headlines</h1>
-        <p className="page-sub">Readers rate the wording and framing of specific headlines and explain why. {num(total)} evaluations so far. <SampleTag /></p>
-        <div className="principle"><Icon name="info" size={16} /><p><strong>We rate headlines, not outlets.</strong> No publication gets a fixed bias label. The same outlet can publish a carefully neutral report one day and a loaded headline the next, and the publication view shows that spread.</p></div>
+        <h1 className="page-title">Community scores for individual articles</h1>
+        <p className="page-sub">Readers rate each article on a five-point scale from Neutral / Factual (100 points) to Nonfactual (0). An article’s community score is the average of those points, out of 100. <SampleTag>{SIM_PARTICIPANTS} simulated participants</SampleTag></p>
+        <div className="principle"><Icon name="info" size={16} /><p><strong>Articles, not outlets, and perception, not proof.</strong> A score is what readers thought of one article. No publication gets a fixed label, and no score is a fact-check. The scale also combines bias and accuracy in one number; the <Link to="methods">Methods</Link> page explains why that matters.</p></div>
       </header>
-      <Tabs id="ratings-tabs" value={tab} onChange={setTab} tabs={[{ key: 'headlines', label: 'All headlines' }, { key: 'spread', label: 'Spread by publication' }, { key: 'queue', label: 'Rate headlines' }]} />
+      <Tabs id="ratings-tabs" value={tab} onChange={setTab} tabs={[{ key: 'queue', label: 'Rate blind' }, { key: 'scores', label: 'Community scores' }, { key: 'spread', label: 'Spread by publication' }]} />
       <div className="tab-pane fade-in" key={tab}>
-        {tab === 'headlines' && <HeadlineTable />}
+        {tab === 'scores' && <ScoreTable />}
         {tab === 'spread' && <PublicationSpread />}
         {tab === 'queue' && <RateQueue />}
       </div>
@@ -34,95 +39,124 @@ export default function BiasRatings() {
   );
 }
 
-function HeadlineTable() {
-  const { evalFor } = useStore();
+function ScoreTable() {
+  const { vis, now, mode } = useStore();
   const [topic, setTopic] = useState('');
   const [pub, setPub] = useState('');
-  const [sort, setSort] = useState('evaluated');
+  const [sort, setSort] = useState('rated');
   const rows = useMemo(() => {
-    let r = articles.map((a) => ({ a, agg: aggregate(a, evalFor(a.id)), mine: evalFor(a.id) }))
-      .filter(({ a }) => (!topic || getEvent(a.eventId).topic === topic) && (!pub || a.pub === pub));
-    const s = { evaluated: (x, y) => y.agg.n - x.agg.n, divided: (x, y) => y.agg.entropy - x.agg.entropy, critical: (x, y) => y.agg.mean - x.agg.mean, neutral: (x, y) => x.agg.mean - y.agg.mean }[sort];
-    return r.sort(s);
-  }, [topic, pub, sort, evalFor]);
+    const r = articles.map((a) => ({ a, v: vis(a) })).filter(({ v }) => v.published)
+      .map((x) => ({ ...x, c: x.v.revealed ? communityAt(x.a.id, now, x.v.rating) : null }))
+      .filter(({ a, v }) => (!topic || getEvent(a.eventId).topic === topic) && (!pub || (!v.sealed && a.pub === pub)));
+    const key = { rated: (x) => x.c.n, divided: (x) => x.c.entropy, high: (x) => x.c.mean ?? -1, low: (x) => -(x.c.mean ?? 101) }[sort];
+    // Sealed rows have no visible score: keep them together at the end, in a neutral order.
+    return r.sort((x, y) => (x.v.sealed - y.v.sealed) || (x.v.sealed ? hash(x.a.id) - hash(y.a.id) : key(y) - key(x)));
+  }, [topic, pub, sort, vis, now]);
   return (
     <>
       <div className="toolbar">
         <div className="toolbar-ctrls wrap">
           <label className="select-wrap"><span className="sr-only">Topic</span><select id="rt-topic" value={topic} onChange={(e) => setTopic(e.target.value)}><option value="">All topics</option>{TOPICS.map((t) => <option key={t}>{t}</option>)}</select></label>
-          <label className="select-wrap"><span className="sr-only">Publication</span><select id="rt-pub" value={pub} onChange={(e) => setPub(e.target.value)}><option value="">All publications</option>{pubList.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-          <label className="select-wrap"><span className="sr-only">Sort</span><select id="rt-sort" value={sort} onChange={(e) => setSort(e.target.value)}><option value="evaluated">Most evaluated</option><option value="divided">Most divided</option><option value="critical">Rated most biased</option><option value="neutral">Rated most neutral</option></select></label>
+          <label className="select-wrap" data-leak-exempt><span className="sr-only">Publication</span><select id="rt-pub" value={pub} onChange={(e) => setPub(e.target.value)}><option value="">All publications</option>{pubList.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+          <label className="select-wrap"><span className="sr-only">Sort</span><select id="rt-sort" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rated">Most ratings</option><option value="divided">Most divided</option><option value="high">Highest score</option><option value="low">Lowest score</option></select></label>
         </div>
-        <span className="small muted">{rows.length} headlines</span>
+        <span className="small muted">{rows.length} articles{mode === 'rating' && pub ? ' (unrated articles excluded from publication filter)' : ''}</span>
       </div>
-      {!rows.length ? <EmptyState title="No headlines match">Try another topic or publication.</EmptyState> : (
+      {!rows.length ? <EmptyState title="No articles match">Try another topic or publication.</EmptyState> : (
         <ul className="hl-table">
-          {rows.map(({ a, agg, mine }) => (
-            <li key={a.id}>
-              <span className="pubmark pubmark-sm">{publications[a.pub].short}</span>
+          {rows.map(({ a, v, c }) => (
+            <li key={a.id} className={v.sealed ? 'is-sealed' : ''}>
+              {v.sealed ? <span className="pubmark pubmark-sm pubmark-sealed" aria-hidden="true">?</span> : <span className="pubmark pubmark-sm">{publications[a.pub].short}</span>}
               <div className="hlt-main">
                 <Link to="article" param={a.id} className="hlt-hl"><Headline text={a.headline} /></Link>
-                <div className="tiny muted">{publications[a.pub].name} · {getEvent(a.eventId).topic}{agg.entropy > 0.85 && <span className="divided-tag">Readers divided</span>}{mine && <span className={`you-rating r${mine.rating}`}>You: {RATING_LABELS[mine.rating]}</span>}</div>
+                <div className="tiny muted row-gap">
+                  {v.sealed ? 'Publication hidden' : publications[a.pub].name} · {getEvent(a.eventId).topic}
+                  <StatusBadge v={v} compact />
+                  {c?.divided && <span className="divided-tag">Readers divided</span>}
+                  {v.rating && <span className={`you-rating r${RATING_OPTIONS.indexOf(optionForPoints(v.rating.points))}`}>You: {optionForPoints(v.rating.points).short} ({v.rating.points})</span>}
+                </div>
               </div>
-              <div className="hlt-dist"><DistributionBar dist={agg.dist} compact /><div className="tiny"><strong>{meanLabel(agg.mean)}</strong> <span className="muted">· {num(agg.n)}</span></div></div>
+              <div className="hlt-dist">
+                {v.sealed ? (
+                  <Link to="article" param={a.id} className="btn btn-primary btn-sm">Rate blind to see score</Link>
+                ) : (
+                  <>
+                    <ScoreBadge score={c.mean} n={c.n} final={v.status === 'closed'} />
+                    {c.n > 0 && <DistributionBar dist={c.dist} compact highlightPoints={v.rating?.points ?? null} />}
+                  </>
+                )}
+              </div>
             </li>
           ))}
         </ul>
       )}
-      <ul className="legend-inline tiny">{RATING_LABELS.map((l, i) => <li key={l}><span className={`swatch r${i}`} />{l}</li>)}</ul>
+      <ul className="legend-inline tiny">{RATING_OPTIONS.map((o, i) => <li key={o.key}><span className={`swatch r${i}`} />{o.label} ({o.points})</li>)}</ul>
     </>
   );
 }
 
 function PublicationSpread() {
-  const { evalFor } = useStore();
-  const rows = pubList.map((p) => ({ p, items: articles.filter((a) => a.pub === p.id).map((a) => ({ a, mean: aggregate(a, evalFor(a.id)).mean })) })).filter((r) => r.items.length);
-  const x = (v) => `${(v / 3) * 100}%`;
+  const { vis, now } = useStore();
+  const rows = pubList.map((p) => ({
+    p,
+    items: articles.filter((a) => a.pub === p.id).map((a) => ({ a, v: vis(a) })).filter(({ v }) => v.revealed)
+      .map(({ a, v }) => ({ a, mean: communityAt(a.id, now, v.rating).mean })).filter((x) => x.mean !== null),
+  })).filter((r) => r.items.length);
+  const x = (val) => `${val}%`;
   return (
     <div className="spread">
-      <p className="small">Each dot is one headline’s community mean rating. A wide spread shows that a publication’s headlines vary from article to article. With only a few sample articles per outlet, this view shows variation, not an average to rely on.</p>
-      <div className="spread-axis"><span /><div className="spread-scale">{['Neutral', 'Slight', 'Moderate', 'Strong'].map((l, i) => <span key={l} style={{ left: x(i) }}>{l}</span>)}</div></div>
-      {rows.map(({ p, items }) => {
-        const ms = items.map((i) => i.mean); const lo = Math.min(...ms), hi = Math.max(...ms);
-        return (
-          <div key={p.id} className="spread-row">
-            <span className="spread-name"><span className="pubmark pubmark-xs">{p.short}</span>{p.name}<span className="tiny muted"> · {items.length}</span></span>
-            <div className="spread-track">
-              {[0, 1, 2, 3].map((i) => <span key={i} className="spread-grid" style={{ left: x(i) }} />)}
-              <span className="spread-range" style={{ left: x(lo), width: `${((hi - lo) / 3) * 100}%` }} />
-              {items.map(({ a, mean }) => <Link key={a.id} to="article" param={a.id} className={`spread-dot m${Math.round(mean)}`} style={{ left: x(mean) }} title={`${plainHeadline(a.headline)} (${mean.toFixed(2)})`} aria-label={`${plainHeadline(a.headline)}, mean ${mean.toFixed(2)}`} />)}
-            </div>
-          </div>
-        );
-      })}
+      <p className="small">Each dot is one article’s community score. A wide spread shows that a publication’s articles vary from story to story. Only articles revealed to you are included, and with so few sample articles per outlet this shows variation, not an average to rely on.</p>
+      {!rows.length ? <EmptyState title="Nothing revealed yet">Rate articles or wait for windows to close to see scores here.</EmptyState> : (
+        <>
+          <div className="spread-axis"><span /><div className="spread-scale">{['0 Nonfactual', '25', '50 Biased', '75', '100 Neutral'].map((l, i) => <span key={l} style={{ left: x(i * 25) }}>{l}</span>)}</div></div>
+          {rows.map(({ p, items }) => {
+            const ms = items.map((i) => i.mean); const lo = Math.min(...ms), hi = Math.max(...ms);
+            return (
+              <div key={p.id} className="spread-row">
+                <span className="spread-name"><span className="pubmark pubmark-xs">{p.short}</span>{p.name}<span className="tiny muted"> · {items.length}</span></span>
+                <div className="spread-track">
+                  {[0, 25, 50, 75, 100].map((g) => <span key={g} className="spread-grid" style={{ left: x(g) }} />)}
+                  <span className="spread-range" style={{ left: x(lo), width: `${hi - lo}%` }} />
+                  {items.map(({ a, mean }) => <Link key={a.id} to="article" param={a.id} className={`spread-dot r${RATING_OPTIONS.indexOf(RATING_OPTIONS.reduce((b, o) => (Math.abs(o.points - mean) < Math.abs(b.points - mean) ? o : b)))}`} style={{ left: x(mean) }} title={`${plainHeadline(a.headline)} (${Math.round(mean)}/100)`} aria-label={`${plainHeadline(a.headline)}, score ${Math.round(mean)}`} />)}
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
 
 function RateQueue() {
-  const { evalFor } = useStore();
-  const pending = articles.filter((a) => !evalFor(a.id));
-  const [currentId, setCurrentId] = useState(() => pending[0]?.id || null);
-  const current = articles.find((a) => a.id === currentId) || pending[0];
+  const { vis, mode } = useStore();
+  const reveal = useReveal();
+  const eligible = articles.filter((a) => vis(a).canRate).sort((x, y) => hash(x.id) - hash(y.id));
+  const [currentId, setCurrentId] = useState(() => eligible[0]?.id || null);
+  const current = articles.find((a) => a.id === currentId) || eligible[0] || null;
   const next = () => {
-    const start = articles.findIndex((a) => a.id === current.id);
-    const order = [...articles.slice(start + 1), ...articles.slice(0, start)];
-    const nxt = order.find((a) => !evalFor(a.id));
+    const nxt = eligible.find((a) => a.id !== current?.id);
     setCurrentId(nxt ? nxt.id : null);
   };
-  if (!current) return <EmptyState title="You’ve evaluated every sample headline">Revise any evaluation from its article page, or check your profile to see how your reputation developed.</EmptyState>;
-  const done = !!evalFor(current.id);
+  if (mode === 'browse') return <EmptyState title="Rating is paused in Browse Mode">You can rate again tomorrow. Meanwhile, the Community scores tab shows live results for every article.</EmptyState>;
+  if (!current) return <EmptyState title="Nothing left to rate right now" action={<Link to="profile" className="btn btn-ghost btn-sm">See your Crowd Alignment</Link>}>You’ve rated every open article. New sample articles are published as the timeline advances.</EmptyState>;
+  const v = vis(current);
   return (
     <div className="queue">
       <div className="queue-head">
-        <span className="small muted">{pending.length} headline{pending.length === 1 ? '' : 's'} left to rate</span>
+        <span className="small muted">{eligible.length} article{eligible.length === 1 ? '' : 's'} open for your blind rating</span>
         <div className="row-gap">
-          <Link to="article" param={current.id} className="btn btn-ghost btn-sm">Read analysis first</Link>
-          <button className={`btn btn-sm ${done ? 'btn-primary' : 'btn-ghost'}`} onClick={next}>{done ? 'Next headline' : 'Skip'} <Icon name="arrow" size={13} /></button>
+          <Link to="article" param={current.id} className="btn btn-ghost btn-sm">Open full article</Link>
+          <button className={`btn btn-sm ${v.rating ? 'btn-primary' : 'btn-ghost'}`} onClick={next} disabled={!v.rating && eligible.length < 2}>{v.rating ? 'Next article' : 'Skip'} <Icon name="arrow" size={13} /></button>
         </div>
       </div>
-      <p className="tiny muted">From {publications[current.pub].name}. The outlet is shown for transparency, but try to judge the wording alone.</p>
-      <EvaluationPanel key={current.id} article={current} />
+      <article className="queue-article">
+        <div className="meta-row">{!v.sealed && shown(reveal.stage, 4) ? <span className="pubname reveal-pub"><span className="pubmark pubmark-sm">{publications[current.pub].short}</span>{publications[current.pub].name}</span> : <SealedPub />}<StatusBadge v={v} /></div>
+        <h2 className="queue-hl"><Headline text={current.headline} /></h2>
+        <p className="art-dek">{current.dek}</p>
+        <div className="art-body">{current.body.map((para, i) => <p key={i}>{para}</p>)}</div>
+      </article>
+      <RatingPanel key={current.id} article={current} v={v} reveal={reveal} showHeadline={false} />
     </div>
   );
 }
