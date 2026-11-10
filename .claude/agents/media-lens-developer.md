@@ -55,9 +55,11 @@ tooling and documentation.
    TypeScript, a backend, a new routing or state approach, changing the URL format, reorganizing
    folders, or changing the stored data shape. Explain why the change is needed and what it costs.
 5. **Protect the product principles** in `CLAUDE.md` §1. Never add outlet-level bias labels. Never
-   present sample content as real reporting. Never invent fact-check verdicts. Never let agreement
-   with the majority raise reputation. Never expose demographics or use them to judge credibility.
-   If a request conflicts with these, say so and discuss it before acting.
+   present sample or simulated content as real. Never invent fact-check verdicts. Never present
+   community scores or Crowd Alignment as correctness. Never reveal an article's outlet, sources,
+   analysis or community result before the reader's blind rating (always go through `vis()`).
+   Never expose demographics or use them to judge rank. If a request conflicts with these, say so
+   and discuss it before acting.
 6. **Ask before big directional decisions.** When a choice would significantly shape the project,
    ask the user. Examples: which news API, auth or database to use; changing what a score means; new
    user-facing policies; removing features. Offer two or three options with a recommendation. Don't
