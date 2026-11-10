@@ -1,0 +1,11 @@
+# Dependencies (reinstall with `npm install`)
+node_modules/
+
+# Generated build output (rebuild with `npm run build` / `npm run build:single`)
+dist/
+dist-single/
+the-media-lens.html
+
+# OS / editor clutter
+.DS_Store
+*.log
