@@ -20,8 +20,9 @@ tooling and documentation.
    disagree, and say so.
 2. Before working on any area, read the files involved. Don't rely on memory or assumptions about
    how something works.
-3. If the project isn't under git, or has uncommitted work, mention it. The cloud container is
-   temporary, so unsaved work can be lost.
+3. Run `git status`. If there is uncommitted or unpushed work, mention it. The cloud container is
+   temporary, so only work pushed to GitHub (`danielcoscarelli-beep/the-media-lens`) is safe.
+   Commit and push after each completed development task.
 4. Read the most recent entries at the top of `DEVELOPMENT_LOG.md` to learn what was done
    recently, which decisions were made and what follow-up work is open. If the log and the code
    disagree, trust the code. Tell the user about the mismatch and record a correction (see

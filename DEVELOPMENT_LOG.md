@@ -27,6 +27,59 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-10: Connect the project to GitHub
+
+**Status:** Completed
+
+**Task / objective:** Back the project up off the temporary cloud container by connecting it to the
+user's GitHub repository `danielcoscarelli-beep/the-media-lens`.
+
+**Implementation:**
+- Attached the repository to the Claude Code session with push access, and cloned it to
+  `/home/user/the-media-lens`. The repository was empty: no commits, only `.git`.
+- Fetched the existing local commit `c71082c` from `/home/user/media-lens`, reset the new clone's
+  `main` to it, and pushed with `git push -u origin main`.
+- Installed dependencies (`npm ci`) and built (`npm run build:single`) in the new folder. Refreshed
+  the ignored root `the-media-lens.html` copy from the build.
+- Updated `CLAUDE.md`:
+  - §3: GitHub URL and remote;
+  - §4: tree root renamed to `the-media-lens/`;
+  - §8: removed the "no remote" limitation;
+  - §10: repository name, checkout path, push-after-each-task workflow, ask before force-pushing.
+- Updated the agent's "Start of every session" step 3 to check for unpushed work and to commit and
+  push after each task.
+
+**Technical explanation:** A "remote" is a copy of the repository hosted elsewhere. Here it is
+GitHub, named `origin`. Pushing uploads commits to it. `-u` makes local `main` "track"
+`origin/main`, so `git status` reports when local work hasn't been pushed. Because the GitHub
+repository was empty, the existing history was moved in unchanged: the commit hash `c71082c` is the
+same locally and on GitHub. No history was rewritten.
+
+**Decision:** The working copy moved from `/home/user/media-lens` to `/home/user/the-media-lens`,
+the folder the session tooling registers for this repository, so future cloud sessions find the
+project at the same path. The old folder was left in place and not deleted. It is superseded and
+should not be used.
+
+**Files:**
+- Created: none tracked (the local clone folder and generated build output are untracked or ignored)
+- Modified: `CLAUDE.md`, `.claude/agents/media-lens-developer.md`, `DEVELOPMENT_LOG.md`
+- Deleted: none
+
+**Testing and results:**
+- After the first push, `git rev-parse HEAD` and `git ls-remote origin refs/heads/main` both
+  returned `c71082c990efadb7d2c33eee63830440640934f5`, so GitHub matches the local copy.
+- `npm ci` and `npm run build:single` succeeded in the new folder.
+- `git status` showed a clean tree after the build, confirming the build outputs are ignored.
+- This entry's own commit and push are verified in the same way after it is written.
+
+**Limitations, open issues and follow-up:**
+- `the-media-lens.html` (the published claude.ai artifact build) is intentionally not on GitHub.
+  Regenerate it with `npm run build:single`.
+- *Proposed:* the rating-system redesign is still waiting for the user's answers to the ten design
+  questions.
+
+---
+
 ## 2026-11-10: Put the project under git version control (local repository)
 
 **Status:** Completed. The local repository exists. Pushing to GitHub was not possible (see Limitations).

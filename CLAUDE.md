@@ -49,7 +49,7 @@ There is **no backend**. Everything runs in the browser.
 - **No other runtime libraries.** No router library, no state library, no CSS framework, no chart library. Routing, state, charts and the source map are hand-written.
 - **Fonts:** Google Fonts — Source Serif 4 (headlines), IBM Plex Sans (UI/body), IBM Plex Mono (numbers/data). Loaded via `<link>` in `index.html` and in `scripts/inline.mjs`, with system fallbacks in CSS.
 - **No tests, no linter, no formatter, no CI.** (Some files contain `// eslint-disable-next-line` comments, but ESLint is *not* installed.)
-- **Git:** a local git repository on branch `main` (since 2026-11-10). It has **no remote yet**, so it is not backed up outside the cloud container; see §10. `.gitignore` excludes `node_modules/`, `dist/`, `dist-single/` and the root `the-media-lens.html` (all regenerable).
+- **Git / GitHub:** git repository on branch `main`, pushed to GitHub at **https://github.com/danielcoscarelli-beep/the-media-lens** (remote `origin`, since 2026-11-10). See §10. `.gitignore` excludes `node_modules/`, `dist/`, `dist-single/` and the root `the-media-lens.html` (all regenerable).
 
 ### Commands
 
@@ -75,7 +75,7 @@ not regenerated automatically — after rebuilding, copy it again if you want to
 ## 4. Project structure
 
 ```
-media-lens/
+the-media-lens/
 ├── index.html              Vite entry HTML (fonts, #root)
 ├── vite.config.js
 ├── package.json
@@ -236,7 +236,6 @@ Inspired by serious news design and data journalism; it should read as credible 
 - Lighter-profile events have less complete annotations than the featured event (e.g. generic `perspectives` defaults from `mk()`).
 - "Original" article links go to publication homepages because the articles are not real.
 - No automated tests, linting, type-checking or CI.
-- Under local git version control, but with no remote (e.g. GitHub), so there is no off-machine backup yet.
 
 ## 9. Unclear / undecided (ask the user before assuming)
 
@@ -248,8 +247,8 @@ Inspired by serious news design and data journalism; it should read as credible 
 
 ## 10. Environment notes
 
-- Project path in the cloud container: `/home/user/media-lens`. The container is ephemeral; work that isn't pushed to a git remote can be lost. A local git repository exists (branch `main`) but has no remote yet. Pushing to GitHub needs a repository the user creates and attaches to the session.
-- Git workflow: commit after each completed development task, with a message describing the change. Run `git status` at the start of a session to check for uncommitted work.
+- GitHub repository: `danielcoscarelli-beep/the-media-lens` (default branch `main`). In cloud sessions the checkout lives at `/home/user/the-media-lens`. The container is ephemeral: **only work that is committed and pushed to GitHub is safe.** (An older, superseded working copy may exist at `/home/user/media-lens` in the original session's container; don't work there.)
+- Git workflow: commit after each completed development task, with a message describing the change, and push it (`git push -u origin <branch>`). Run `git status` at the start of a session to check for uncommitted or unpushed work. Ask the user before force-pushing or rewriting history.
 - `node_modules/` is installed locally; run `npm install` in a fresh checkout.
 
 ## 11. Documentation, development log and reporting
