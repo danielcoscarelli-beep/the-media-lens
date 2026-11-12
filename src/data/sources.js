@@ -121,6 +121,26 @@ export const sources = {
   'joint-communique': { name: 'EU–UK joint communiqué on undersea infrastructure', publisher: 'European Council / UK Ministry of Defence', date: '2026-10-29', type: 'document', url: 'https://www.consilium.europa.eu', description: 'Announces patrol mission and shared sensor network.' },
   'nato-spox': { name: 'NATO spokesperson remarks', publisher: 'NATO', date: '2026-10-29', type: 'statement', url: 'https://www.nato.int', description: 'Welcomes the mission and describes coordination arrangements.' },
   'russia-mfa': { name: 'Russian foreign ministry statement', publisher: 'Russian Ministry of Foreign Affairs', date: '2026-10-29', type: 'statement', url: null, description: 'Calls the mission "provocative militarization."' },
+
+  // ── Grid heat wave ─────────────────────────────────────────────────────
+  'spcc-alert': { name: 'Energy Emergency Alert and conservation appeal', publisher: 'Southwest Power Coordinating Council (fictional grid operator)', date: '2026-11-05', type: 'document', url: null, description: 'Asks customers to reduce use from 3 to 8 p.m.; cites record demand, lower-than-forecast wind output and two unplanned gas-plant outages.' },
+  'nws-records': { name: 'Daily temperature records', publisher: 'National Weather Service', date: '2026-11-05', type: 'govdata', url: 'https://www.weather.gov', description: 'Lists record highs set at 14 stations in the region.' },
+  'legislator-renewables': { name: 'State legislator’s statement on renewable mandates', publisher: 'Office of a state senator', date: '2026-11-05', type: 'statement', url: null, description: 'Argues renewable mandates left the grid short of reliable capacity.' },
+  'climate-scientist': { name: 'Climate scientist comment on late-season heat', publisher: 'University climate research center', date: '2026-11-05', type: 'expert', url: null, description: 'Says warming makes heat waves like this more likely; does not attribute this specific event.' },
+  'price-data': { name: 'Real-time wholesale power prices', publisher: 'Grid market data (aggregated)', date: '2026-11-05', type: 'govdata', url: null, description: 'Shows prices briefly reaching the market cap during the evening peak.' },
+
+  // ── Transit strike ─────────────────────────────────────────────────────
+  'lrta-statement': { name: 'Transit authority statement and final contract offer', publisher: 'Lakeshore Regional Transit Authority (fictional)', date: '2026-11-06', type: 'statement', url: null, description: 'Describes a 9% raise over three years and cites a $140 million operating deficit.' },
+  'union-statement': { name: 'Union strike announcement', publisher: 'Amalgamated Rail and Transit Workers Local 412 (fictional)', date: '2026-11-06', type: 'statement', url: null, description: 'Cites unfilled safety positions and a rise in reported on-the-job injuries.' },
+  'injury-reports': { name: 'Workplace injury filings, past two years', publisher: 'State occupational safety agency', date: '2026-11-01', type: 'govdata', url: null, description: 'Shows reported injuries at the authority rose 18% over two years.' },
+  'rider-interview': { name: 'Interview with a commuter', publisher: 'Named rider', date: '2026-11-06', type: 'interview', url: null, description: 'Describes a two-hour commute on replacement buses.' },
+
+  // ── AI hiring law ──────────────────────────────────────────────────────
+  'hiring-bill': { name: 'Automated Employment Decision Tools Accountability Act — passed text', publisher: 'State legislature', date: '2026-11-07', type: 'document', url: null, description: 'Requires annual independent bias audits of automated hiring tools, public audit summaries and notice to applicants.' },
+  'business-council': { name: 'Business council statement and cost estimate', publisher: 'State Business Council (industry group)', date: '2026-11-07', type: 'statement', url: null, description: 'Estimates audits could cost employers $20,000–$75,000 per tool per year. Method not published.' },
+  'hiring-study': { name: 'Study of résumé-screening tools', publisher: 'University computer science department', date: '2026-06-12', type: 'study', url: null, description: 'Peer-reviewed audit finding that two commercial screening tools ranked equally qualified applicants differently by inferred gender.' },
+  'sponsor-delgado': { name: 'Floor remarks of the bill’s sponsor, Assemblymember Rosa Delgado', publisher: 'State Assembly record', date: '2026-11-07', type: 'interview', url: null, description: 'Says applicants should know when software is judging them.' },
+  'governor-spox': { name: 'Governor’s spokesperson', publisher: 'Office of the Governor', date: '2026-11-07', type: 'statement', url: null, description: 'Says the governor will review the bill; no position given.' },
 };
 
 export const getSource = (id) => (sources[id] ? { id, ...sources[id] } : null);

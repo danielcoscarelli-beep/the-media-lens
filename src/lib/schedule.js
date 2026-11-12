@@ -27,6 +27,9 @@ export const EVENT_OFFSET_HOURS = {
   'permitting-act': -1.5, // open, ~22h left at start (featured)
   'water-cyber': 3,       // published 3h after first visit
   'baltic-cables': 9,     // published 9h after first visit
+  'grid-heat': -6,        // open, ~18h left at start (added 2026-11-12)
+  'transit-strike': 20,   // published 20h after first visit
+  'ai-hiring': 34,        // published 34h after first visit
 };
 
 const hash = (s) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);

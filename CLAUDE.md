@@ -97,12 +97,12 @@ the-media-lens/
     ├── styles.css          ALL styling (design tokens at top)
     ├── data/               Sample data (the "database")
     │   ├── publications.js 12 outlets (id, name, short code, kind, homepage). No bias field — by design.
-    │   ├── events.js       7 events + TOPICS; `date` = ORIGINAL sample date (only used to shift source dates)
-    │   ├── articles.js     30 articles (6 fully annotated featured + 24 lighter via mk()); MARKERS
+    │   ├── events.js       10 events + TOPICS; `date` = ORIGINAL sample date (only used to shift source dates)
+    │   ├── articles.js     42 articles (6 fully annotated featured + 36 lighter via mk()); MARKERS
     │   ├── articleBodies.js Article text keyed by `ref` (never names the outlet)
     │   ├── ratingScale.js  The five options and point values; nearestOption(), toneForScore()
-    │   ├── sources.js      35 sources + SOURCE_TYPES
-    │   ├── claims.js       25 claims + CLAIM_STATUS + CLAIM_KIND
+    │   ├── sources.js      49 sources + SOURCE_TYPES
+    │   ├── claims.js       32 claims + CLAIM_STATUS + CLAIM_KIND
     │   └── user.js         defaultUser
     ├── services/
     │   ├── api.js          Async article/event access (mock latency); blind-safe search
@@ -150,7 +150,7 @@ the-media-lens/
 
 ### Time, schedule and rating windows (`lib/clock.js`, `lib/schedule.js`)
 - **App time** = `Date.now()` + a demo offset. Every time-based rule reads `clock.now()`. The offset only changes through Demo controls.
-- **Timeline epoch** = the moment this browser first opened the app (localStorage `media-lens:clock:v1`). Events are published at fixed hour offsets from it (`EVENT_OFFSET_HOURS`: two closed at start, three open, two published later); articles follow within about an hour, in a stable non-alphabetical order.
+- **Timeline epoch** = the moment this browser first opened the app (localStorage `media-lens:clock:v2`; bumping the key restarts every visitor’s timeline). Events are published at fixed hour offsets from it (`EVENT_OFFSET_HOURS`: two closed at start, four open, four published later at +3h, +9h, +20h and +34h; the last window closes about 58h after the first visit); articles follow within about an hour, in a stable non-alphabetical order.
 - Each article’s window: `opensAt` = publication, `closesAt` = `opensAt` + 24 h. `statusAt()` → `upcoming | open | closed`, **always computed**, never stored.
 - Unpublished (`upcoming`) articles are hidden everywhere; opening one directly shows “Not published yet”.
 - Displayed publication times come from the schedule. Sample source-document dates are shifted by the same amount as their event (`shiftedSourceDate`).
@@ -171,7 +171,7 @@ the-media-lens/
 - Persisted in the store, so it survives reloads and browser restarts (same browser only).
 
 ### State (`state/store.jsx`)
-- `useReducer` with `{ user, ratings, browseSessions, journey }`, persisted to localStorage key **`media-lens:v2`** (all access in try/catch). Old `media-lens:v1` data is ignored, not migrated.
+- `useReducer` with `{ user, ratings, browseSessions, journey }`, persisted to localStorage key **`media-lens:v3`** (all access in try/catch). Older keys (`v1`, `v2`) are ignored, not migrated. Bump this key together with the clock key whenever the timeline is reset.
 - `ratings: [{ articleId, points, submittedAt }]`. One per article and **final** (the reducer ignores duplicates).
 - `submitRating(id, points)` re-checks `canRate` against `clock.now()` at submission time, then calls `clock.notify()` so the new rating is counted immediately.
 - Exposes: `now`, `boundaryKey`, `mode`, `vis`, `ratingFor`, `ratedToday`, `canEnterBrowse`, `enterBrowse`, `alignment`, `demo` (`advance`, `restart`), `toast`, `markJourney`.
@@ -206,7 +206,7 @@ the-media-lens/
 - Headlines mark discussed wording with `[[double brackets]]`. Highlights are shown only on revealed articles.
 - `sourceUses[].cls`: `primary | secondary | anonymous | expert | unverified`. Source `type`: `document | govdata | statement | interview | anonymous | study | expert | outlet`. Source URLs are real institution homepages only.
 - **Claim**: `text, kind, status, source, corroboratedBy[], contradicts[]?, evidence, limitations`.
-- Featured event `permitting-act`: 6 fully annotated articles (AP, Reuters, WSJ, NYT, Fox, CNN). The other 6 events have 4 lighter articles each. Sample content deliberately varies within outlets — keep it that way.
+- Featured event `permitting-act`: 6 fully annotated articles (AP, Reuters, WSJ, NYT, Fox, CNN). The other 9 events have 4 lighter articles each (grid-heat, transit-strike and ai-hiring were added 2026-11-12). Sample content deliberately varies within outlets — keep it that way.
 
 ### Features by page
 - **Home**: dateline (app date), hero, 8-step walkthrough, “Articles waiting for your rating” (sealed list with countdowns; paused message in Browse Mode), top stories, trending, coverage contrasts (only from fully revealed events), recent results (closed articles) + your ratings + live simulated activity count, featured-event aside (locked until its articles are revealed).
@@ -265,7 +265,7 @@ Inspired by serious news design and data journalism; it should read as credible 
 - **Crowd Alignment rewards hedging.** Measured on 2026-11-10: always answering 75 scored at about the 49th percentile of the simulated cohort, without reading anything (disclosed on Methods).
 - **The five-point scale mixes bias, misleading presentation and factual accuracy** (user decision; disclosed on Methods).
 - **Blind rating is imperfect:** article text names some of its sources, and headline style can hint at an outlet.
-- **Demo timeline:** sample articles publish relative to your first visit, and the library runs out after about 2 days (Restart timeline resets it). With 30 articles, at most about 21 ratings can become eligible, so a permanent rank (15) needs most of them.
+- **Demo timeline:** sample articles publish relative to your first visit, and the library runs out about 58 hours later (Restart timeline resets it). Up to 33 of the 42 articles can be rated and become eligible, so a permanent rank (15) is reachable in about two days of rating.
 - The simulated cohort’s prior records are generated from a simplified model.
 - Home trending sparkline values (`TREND`) and the featured event choice are hard-coded. The featured-analysis stats are now computed.
 - Each article’s `intensity` is hand-entered; no lexicon or computation exists.

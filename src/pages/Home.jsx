@@ -198,9 +198,9 @@ export default function Home() {
               const c = communityAt(a.id, now, v.rating);
               return (
                 <li key={a.id} className="feed-item">
-                  <ScoreBadge score={c.mean} n={c.n} final />
+                  <ScoreBadge score={c.mean} final />
                   <div>
-                    <div className="small"><strong>{publications[a.pub].name}</strong> · closed {fmtRelative(windowFor(a.id).closesAt, now)}</div>
+                    <div className="small"><strong>{publications[a.pub].name}</strong> · {num(c.n)} ratings · closed {fmtRelative(windowFor(a.id).closesAt, now)}</div>
                     <Link to="article" param={a.id} className="feed-hl"><Headline text={a.headline} /></Link>
                   </div>
                 </li>

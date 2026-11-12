@@ -27,6 +27,89 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-12: Reset the timeline and add three new hypothetical news events
+
+**Status:** Completed
+
+**Task / objective:** The user asked to rerun the prototype with the latest updates, reset the
+timers, and add new hypothetical articles.
+
+**Implementation:**
+- **New sample content:** three new events, each covered by four outlets (12 new lighter-profile
+  articles):
+  - `grid-heat` (Climate): a grid operator’s emergency appeal during record heat. Reuters, Fox, NYT,
+    Bloomberg.
+  - `transit-strike` (Economy): a regional transit strike. NPR, WSJ, Guardian, CNN.
+  - `ai-hiring` (Technology): a state bill requiring bias audits of AI hiring tools. AP, WSJ, CNN,
+    Politico.
+- The agencies, union and bill sponsor are fictional. Framing deliberately varies within outlets:
+  - Fox is loaded on the grid story but was neutral on the Fed and water stories;
+  - CNN is neutral on the strike but loaded on AI hiring;
+  - the Guardian is loaded on the strike;
+  - the WSJ is loaded on AI hiring and mild on the strike.
+- Added 14 sources and 7 claims for the new events, plus article text (2 paragraphs each, never
+  naming the outlet) and hand-written comparison summaries.
+- **Schedule** (`EVENT_OFFSET_HOURS`): `grid-heat` opens 6h before the first visit, so about 18h are
+  left at the start; `transit-strike` publishes at +20h and `ai-hiring` at +34h. The library now
+  lasts about 58 hours.
+- **Timer reset:** bumped the storage keys (`media-lens:clock:v1` → `v2`, `media-lens:v2` → `v3`).
+  Every browser, including ones that had already opened the prototype, now starts a fresh timeline
+  with no previous ratings, Browse sessions or walkthrough progress. The stored shape is unchanged.
+- **Bug fix:** on Home, the “Recent results” score badges overflowed their 116px column and overlapped
+  the outlet name. The bug was introduced in the 2026-11-10 redesign. Feed rows with a score badge
+  now use an auto-width column with a 150px minimum, and the rating count moved into the text line.
+- **Tests:** the E2E test now also checks the new Fox grid article for leaks on new page states, and
+  checks the scheduled publication of the transit (+20h) and AI-hiring (+34h) articles.
+
+**Technical explanation:** Each browser’s timeline starts from an `epoch` saved in localStorage the
+first time the app runs. Changing the key name makes the app look for a key that doesn’t exist yet,
+so it creates a new epoch from the current time. That’s a reset for everyone, with no code needed to
+delete old data. The ratings key was bumped at the same time, so ratings made on the old timeline
+don’t point at articles that are now scheduled differently. New articles plug into the existing
+system through their data fields: an opaque `id`, a `ref`, `crowd` parameters for the simulation,
+and a `BODIES[ref]` text. The simulation, visibility rules, search and rankings picked them up with
+no code changes.
+
+**Decision:** I added events rather than replacing the existing ones. This keeps the fully annotated
+featured event and the closed-at-start events that show the reveal immediately, and it lengthens the
+library, which addresses the limitation that permanent ranks were hard to reach.
+
+**Files:**
+- Created: none
+- Modified:
+  - `src/data/events.js`, `src/data/articles.js`, `src/data/articleBodies.js`,
+    `src/data/sources.js`, `src/data/claims.js`
+  - `src/lib/schedule.js`, `src/lib/clock.js`, `src/state/store.jsx`
+  - `src/pages/Home.jsx`, `src/styles.css`
+  - `tests/e2e/rating-flow.e2e.cjs`
+  - `CLAUDE.md`, `DEVELOPMENT_LOG.md`
+- Deleted: none
+
+**Testing and results:**
+- **Data validation script:** 42 articles and 10 events; no duplicate ids; every source and claim
+  id resolves; every article has text; no article text contains an outlet name.
+- **Simulated counts for the new articles:** 116–178 ratings each, so all are eligible for Crowd
+  Alignment. Final averages range from 45 (Fox grid) to 93 (AP AI hiring).
+- `npm test`: 14/14 passed. `npm run build:single`: succeeded.
+- **E2E: 82/82 passed.** The 75 earlier checks plus:
+  - leak scans on `#explore-grid`, `#compare-grid-heat`, the Fox grid article and
+    `#sources-grid-heat`;
+  - the transit article unpublished at the start and open after +24h;
+  - the AI-hiring article still unpublished after +24h.
+- **Screenshots:** the Home page at the start of the timeline shows the new grid articles in the
+  lists (Climate: 2 events). The fixed “Recent results” layout was checked, with no horizontal
+  scroll at 390px.
+- **Not verified:** the +34h AI-hiring publication in a browser (the unit-level schedule logic is
+  the same code path); Safari and Firefox.
+
+**Limitations, open issues and follow-up:**
+- Resetting by bumping keys leaves the old values in browser storage, unused.
+- New events are lighter-profile, like the earlier non-featured ones: generic `perspectives`
+  defaults and short bodies.
+- *Proposed:* the decision on real articles (headline plus lede excerpt) is still open.
+
+---
+
 ## 2026-11-12: Apply the user’s decisions on the rating redesign
 
 **Status:** Completed

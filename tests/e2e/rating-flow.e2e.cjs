@@ -29,6 +29,8 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
   // outside, so the test uses the stable public ids from src/data/articles.js.
   const AP = { id: 'kxfv', pub: 'Associated Press', author: 'Jordan Ellery', uniqueSource: 'Timelines Vary Widely', headline: 'Senate approves bill to speed permits' };
   const FOX = { id: 'h4mu', author: 'Brett Lancaster', headline: 'Senate Clears Bill to Slash Red Tape' };
+  const GRID = { id: 'p527', author: 'Colby Rhodes', headline: 'Green Energy Failures Push Grid' }; // added 2026-11-12, open at start
+  const TRANSIT = 'nf4s', AIHIRING = 'tz66'; // published at +20h and +34h
   const CARD_SELECTORS = '.acard, .ccol, .lineup li, .hl-table li, .open-list li, .feed-item, .side-list li, .contrast-list li, .ecard';
 
   await go('#home');
@@ -38,7 +40,7 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
 
   // ── Leak scan while AP and Fox permitting articles are sealed ─────────────
   const scan = async (label) => {
-    const found = await page.evaluate(({ AP, FOX, PUBS, CARD_SELECTORS }) => {
+    const found = await page.evaluate(({ AP, FOX, GRID, PUBS, CARD_SELECTORS }) => {
       const issues = [];
       const exempt = (el) => !!el.closest('[data-leak-exempt]');
       const texts = [];
@@ -50,10 +52,10 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
       }
       const visible = [...document.body.querySelectorAll('*')].filter((e) => !exempt(e) && e.children.length === 0 && !['SCRIPT', 'STYLE'].includes(e.tagName)).map((e) => e.textContent).join('\n');
       const all = `${visible}\n${texts.join('\n')}\n${location.hash}`;
-      for (const s of [AP.pub, AP.author, AP.uniqueSource, FOX.author]) if (all.includes(s)) issues.push(`found "${s}"`);
+      for (const s of [AP.pub, AP.author, AP.uniqueSource, FOX.author, GRID.author]) if (all.includes(s)) issues.push(`found "${s}"`);
       for (const el of document.querySelectorAll(CARD_SELECTORS)) {
         const t = el.innerText || '';
-        if (!(t.includes(AP.headline) || t.includes(FOX.headline))) continue;
+        if (!(t.includes(AP.headline) || t.includes(FOX.headline) || t.includes(GRID.headline))) continue;
         if (el.closest('.ecard')) continue; // event cards contain several articles; checked by the global scan
         for (const p of PUBS) if (t.includes(p)) issues.push(`card shows "${p}"`);
         if (/\d+\s*\/100/.test(t)) issues.push('card shows a score');
@@ -61,10 +63,12 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
         if (links.length) issues.push(`card links out: ${links[0]}`);
       }
       return issues;
-    }, { AP, FOX, PUBS, CARD_SELECTORS });
+    }, { AP, FOX, GRID, PUBS, CARD_SELECTORS });
     check(`no leak on ${label}`, found.length === 0, found.join('; '));
   };
-  for (const h of ['#home', '#explore', '#explore-permitting', '#explore-senate', '#compare', '#compare-permitting-act', `#article-${AP.id}`, `#article-${FOX.id}`, '#sources-permitting-act', `#sources-${AP.id}`, '#profile', '#methods']) { await go(h); await scan(h); }
+  for (const h of ['#home', '#explore', '#explore-permitting', '#explore-senate', '#explore-grid', '#compare', '#compare-permitting-act', '#compare-grid-heat', `#article-${AP.id}`, `#article-${FOX.id}`, `#article-${GRID.id}`, '#sources-permitting-act', '#sources-grid-heat', `#sources-${AP.id}`, '#profile', '#methods']) { await go(h); await scan(h); }
+  await go(`#article-${TRANSIT}`);
+  check('transit article not published at start', (await page.textContent('.page')).includes('Not published yet'));
   await go('#explore'); await page.click('text=By event'); await page.selectOption('#sort', 'publication'); await page.waitForTimeout(600); await scan('explore sorted by publication');
   await page.check('[data-leak-exempt] input[type=checkbox] >> nth=4'); await page.waitForTimeout(600); // Associated Press filter
   check('publication filter excludes sealed AP article', !(await page.textContent('.results')).includes(AP.headline));
@@ -140,6 +144,11 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
   await go(`#article-${AP.id}`);
   check('after 24h: AP article closed', (await page.textContent('.article-side')).includes('Closed'));
   check('after 24h: final score labeled', (await page.textContent('.rpanel')).includes('Final community score'));
+  await go(`#article-${TRANSIT}`);
+  check('after 24h: transit article published and open', (await page.$$('.rate-opt')).length === 5);
+  await go(`#article-${AIHIRING}`);
+  check('after 24h: AI-hiring article still unpublished (opens at +34h)', (await page.textContent('.page')).includes('Not published yet'));
+  await go(`#article-${AP.id}`);
   check('after 24h: new day returns to Rating Mode', (await page.textContent('.modebar')).includes('Rating Mode'));
   await go('#profile'); await shot('07-profile-provisional');
   const prof = await page.textContent('.page');

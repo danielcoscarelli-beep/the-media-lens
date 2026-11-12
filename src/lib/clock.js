@@ -11,7 +11,8 @@
 // visitor starts with some articles closed, some open and some still to come.
 // Persisted in localStorage (key below) so refreshes keep the same timeline.
 // ─────────────────────────────────────────────────────────────────────────────
-const KEY = 'media-lens:clock:v1';
+// v2 (2026-11-12): bumped to restart every visitor's timeline when new sample articles were added.
+const KEY = 'media-lens:clock:v2';
 const listeners = new Set();
 let state = null;
 

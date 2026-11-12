@@ -161,4 +161,53 @@ export const BODIES = {
     'European nations are deploying warships to the Baltic Sea after suspected Russian sabotage of undersea cables that carry internet and power across the region.',
     'Investigations into the outages are ongoing. NATO welcomed the mission.',
   ],
+  // ── Added 2026-11-12 ─────────────────────────────────────────────────────
+  'reuters-grid': [
+    'The operator of the Southwest power grid issued an emergency appeal on Wednesday asking customers to cut electricity use from 3 to 8 p.m., as record late-season heat pushed demand above forecasts.',
+    'The Southwest Power Coordinating Council said demand peaked near its all-time high while wind output ran below forecast and two natural gas plants went offline unexpectedly. Customers responded and rolling outages were avoided, the council said. The National Weather Service reported record highs at 14 stations.',
+  ],
+  'fox-grid': [
+    'The Southwest power grid came within hours of rolling blackouts Wednesday as a brutal heat wave baked the region and wind turbines sat nearly still.',
+    '“We were told renewables would keep the lights on. Today they didn’t,” said a state senator who has opposed the region’s renewable energy mandates. The grid operator asked millions of customers to turn up thermostats and delay running appliances until evening.',
+  ],
+  'nyt-grid': [
+    'A heat wave that set temperature records at 14 weather stations this week pushed the Southwest’s power grid close to its limits, the kind of late-season extreme that scientists say a warming climate makes more likely.',
+    '“We are seeing heat arrive later in the year and hit harder,” said a climate scientist at a university research center, though no study has yet examined this event. The grid operator asked customers to conserve power during the evening peak.',
+  ],
+  'bbg-grid': [
+    'Wholesale electricity prices in the Southwest briefly reached the market cap on Wednesday evening as the regional grid operator asked customers to conserve power during record heat.',
+    'The operator cited higher-than-forecast demand, weak wind generation and two unplanned gas-plant outages. Prices fell back after 8 p.m. as temperatures eased and demand dropped.',
+  ],
+  'npr-transit': [
+    'Commuter rail service stopped Thursday morning after operators and mechanics at the Lakeshore Regional Transit Authority walked off the job, the first strike at the agency in more than 20 years.',
+    'The union says dozens of safety positions have gone unfilled while injuries rose. The authority says it offered a 9% raise over three years and faces a $140 million deficit. “I left at five this morning and I still won’t make it on time,” said one rider waiting for a replacement bus.',
+  ],
+  'wsj-transit': [
+    'Tens of thousands of commuters were left scrambling Thursday after a union walkout shut down commuter rail service at a regional transit agency already facing a $140 million budget shortfall.',
+    'The authority said its offer of a 9% raise over three years was the most it could afford without cutting service. The union also cited safety staffing.',
+  ],
+  'guardian-transit': [
+    'Transit workers walked off the job on Thursday, saying years of unfilled safety posts have left them working in unsafe conditions as injury reports soared.',
+    'State records show reported injuries at the authority rose 18% over two years. “We keep the trains running safely, and they won’t staff the jobs that keep us safe,” a union mechanic said.',
+  ],
+  'cnn-transit': [
+    'Commuter rail service is suspended after regional transit workers went on strike Thursday. Buses are running on a reduced weekday schedule, and the authority has added shuttle service at the busiest stations.',
+    'The union and the transit authority remain apart on pay and safety staffing. No new negotiating sessions have been scheduled.',
+  ],
+  'ap-aihiring': [
+    'State lawmakers on Friday passed a bill that would require employers using automated tools to screen job applicants to commission annual independent audits for bias and to tell applicants when such tools are used.',
+    '“People deserve to know when software is judging them,” said Assemblymember Rosa Delgado, the bill’s sponsor. A state business council opposed the measure, estimating audits could cost up to $75,000 per tool each year. The bill now goes to the governor.',
+  ],
+  'wsj-aihiring': [
+    'Employers would have to pay for annual audits of the artificial intelligence tools they use to screen job applicants under a bill passed Friday, a mandate business groups say could cost up to $75,000 per tool each year.',
+    'Companies would also have to publish audit summaries and notify applicants. Business groups are urging the governor to veto the bill.',
+  ],
+  'cnn-aihiring': [
+    'Job seekers would be protected from biased artificial intelligence screening under a bill passed Friday that requires employers to audit the software they use to sort applicants.',
+    'A peer-reviewed study this year found that two commercial résumé-screening tools ranked equally qualified applicants differently based on inferred gender. “People deserve to know when software is judging them,” said the bill’s sponsor.',
+  ],
+  'politico-aihiring': [
+    'A bill requiring bias audits of AI hiring tools is headed to the governor’s desk, setting up a lobbying fight over whether she will sign it.',
+    'The governor’s office said only that she would review the bill. Business groups are pressing for a veto, citing compliance costs, while labor and civil rights groups are urging her to sign.',
+  ],
 };
