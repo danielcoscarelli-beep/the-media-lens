@@ -56,7 +56,8 @@ tooling and documentation.
    folders, or changing the stored data shape. Explain why the change is needed and what it costs.
 5. **Protect the product principles** in `CLAUDE.md` §1. Never add outlet-level bias labels. Never
    present sample or simulated content as real. Never invent fact-check verdicts. Never present
-   community scores or Crowd Alignment as correctness. Never reveal an article's outlet, sources,
+   community scores as fact-checks; Crowd Alignment is the ranking system (no disclaimers that
+   undermine it). Never reveal an article's outlet, sources,
    analysis or community result before the reader's blind rating (always go through `vis()`).
    Never expose demographics or use them to judge rank. If a request conflicts with these, say so
    and discuss it before acting.

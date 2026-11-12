@@ -21,11 +21,12 @@ export function ModeDialog({ onClose }) {
     <div className="modal-wrap" onClick={onClose}>
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="mode-dialog-title" ref={ref} onClick={(e) => e.stopPropagation()}>
         <div className="kicker">Switch modes</div>
-        <h2 id="mode-dialog-title" className="modal-title">Enter Browse Mode for the rest of today?</h2>
+        <h2 id="mode-dialog-title" className="modal-title">Forfeit rating for the rest of today?</h2>
+        <p className="small">Entering Browse Mode ends your rating for today.</p>
         <ul className="modal-list">
           <li>You’ll see live community scores, publications and sources for every article.</li>
           <li><strong>You won’t be able to submit any ratings until tomorrow</strong> (local midnight, in <Countdown until={nextLocalMidnight(now)} />).</li>
-          {openUnrated > 0 && <li>The {openUnrated} open article{openUnrated === 1 ? '' : 's'} you haven’t rated can’t be rated later, even after Browse Mode ends, because you’ll have seen {openUnrated === 1 ? 'its' : 'their'} results.</li>}
+          {openUnrated > 0 && <li>You forfeit the {openUnrated} open article{openUnrated === 1 ? '' : 's'} you haven’t rated: {openUnrated === 1 ? 'it' : 'they'} can’t be rated later, even after Browse Mode ends, because you’ll have seen {openUnrated === 1 ? 'its' : 'their'} live results.</li>}
         </ul>
         <div className="modal-actions">
           <button className="btn btn-ghost" onClick={onClose}>Keep rating</button>

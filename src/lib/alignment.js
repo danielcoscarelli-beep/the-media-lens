@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CROWD ALIGNMENT and percentile ranks.
 //
-// Crowd Alignment measures how closely your ratings anticipate the eventual community
-// average. It measures prediction of consensus, NOT whether you were right.
+// Crowd Alignment is The Media Lens's measure of rating skill: how closely your ratings
+// anticipate the eventual community average (the "wisdom of the crowd").
 //
 // Per article (only after its window closes):
 //   othersMean = final mean of everyone else's ratings (your own is always excluded)
@@ -31,13 +31,13 @@ export const RANK_MIN = 15;
 export const SHRINK_K = 5;
 
 export const TIERS = [
-  { name: 'Reader', min: 0 },
-  { name: 'Contributor', min: 20 },
-  { name: 'Analyst', min: 40 },
-  { name: 'Correspondent', min: 60 },
-  { name: 'Senior Correspondent', min: 75 },
-  { name: 'Editor', min: 90 },
-  { name: 'Fellow', min: 97 },
+  { name: 'Bronze', min: 0 },
+  { name: 'Silver', min: 20 },
+  { name: 'Gold', min: 40 },
+  { name: 'Platinum', min: 60 },
+  { name: 'Diamond', min: 75 },
+  { name: 'Master', min: 90 },
+  { name: 'Grandmaster', min: 97 },
 ];
 export const tierFor = (pct) => [...TIERS].reverse().find((t) => pct >= t.min);
 export const nextTier = (pct) => TIERS.find((t) => t.min > pct) || null;

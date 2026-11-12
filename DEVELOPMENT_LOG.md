@@ -27,6 +27,74 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-12: Apply the user’s decisions on the rating redesign
+
+**Status:** Completed
+
+**Task / objective:** The user answered the nine open design questions from the 2026-11-10 plan.
+Seven confirm what was already built:
+- ratings can’t be changed;
+- the demo timeline;
+- the thresholds;
+- analysis hidden until rating;
+- articles open during Browse Mode can never be rated;
+- old saved data discarded;
+- small automated tests.
+
+Three needed changes:
+1. **Abandon the “majority isn’t accuracy” framing** and treat Crowd Alignment as *the* ranking
+   system.
+2. **Replace the editorial rank names** (“too on the nose”) with a conventional-sounding ladder.
+3. **Make it explicit that entering Browse Mode forfeits rating** for the day.
+
+**Implementation:**
+- Rank tiers in `src/lib/alignment.js` are now Bronze (0), Silver (20), Gold (40), Platinum (60),
+  Diamond (75), Master (90) and Grandmaster (97). The percentile boundaries are unchanged.
+- Removed the Profile callout saying Crowd Alignment “doesn’t measure whether you were right” and
+  replaced it with a plain description. Removed the Methods limitation “Crowd Alignment rewards
+  predicting the crowd, not being right”, and reworded the Methods introduction so Crowd Alignment
+  is presented as the platform’s ranking system.
+- **Decision:** two Methods limitations were kept because they describe how the mechanics actually
+  behave, not a stance:
+  - “A community score is not a fact-check”, which concerns the score, not the ranking;
+  - “Hedging toward the middle is rewarded”, which is a measured weakness of the formula.
+- The Browse Mode dialog title is now “Forfeit rating for the rest of today?”, and it states that
+  unrated open articles are forfeited.
+- Updated:
+  - `CLAUDE.md`: principle 4 rewritten as “Crowd Alignment is the ranking system”, rule 5, the §5
+    tier list and the §8 hedging note;
+  - agent rule 5;
+  - the unit test’s tier names.
+
+**Technical explanation:** Tier names are data in the `TIERS` array. The Profile ladder, the
+navigation chip, the Methods table and the rank text all read from it, so renaming them there
+updated every page. Nothing about the scoring, percentiles or thresholds changed.
+
+**Files:**
+- Created: none
+- Modified: `src/lib/alignment.js`, `src/pages/Profile.jsx`, `src/pages/Methods.jsx`,
+  `src/components/Mode.jsx`, `tests/unit/rating-system.test.mjs`, `CLAUDE.md`,
+  `.claude/agents/media-lens-developer.md`, `DEVELOPMENT_LOG.md`
+- Deleted: none
+
+**Testing and results:**
+- `npm test`: 14/14 passed, including the renamed tier boundaries.
+- `npm run build:single`: succeeded.
+- E2E: 75/75 passed.
+- Screenshots reviewed: the forfeit dialog; and, after +24h on the demo clock with five ratings, the
+  Profile showed “Gold (provisional), 49th percentile, 10.7 percentile points to Platinum”.
+- A grep confirmed that no old rank names or “doesn’t measure whether you were right” wording
+  remain in `src/`, `CLAUDE.md` or the agent file.
+
+**Limitations, open issues and follow-up:**
+- The 2026-11-10 entry above describes the old names and framing. It is historical and was
+  intentionally not rewritten.
+- *Proposed (not implemented):* how to use real articles without republishing them. Options were
+  discussed with the user on 2026-11-12: headline plus a short lede excerpt for blind rating,
+  licensing, and openly licensed sources. No decision has been made.
+
+---
+
 ## 2026-11-10: Redesign the rating system (blind five-point ratings, 24-hour windows, Browse Mode, Crowd Alignment)
 
 **Status:** Completed. All front-end behavior is implemented and tested. Multi-user behavior is

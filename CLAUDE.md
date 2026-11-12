@@ -23,7 +23,7 @@ Core principles (these are product rules, not just preferences — see §7):
 1. **Rate articles, never outlets.** No publication gets a fixed bias label.
 2. **Keep factual accuracy, framing and opinion distinguishable.** The five-point community scale deliberately combines bias, misleading presentation and factual accuracy (user decision, 2026-11-10). It must always be presented as *community perception*, never as a fact-check, and the article analysis keeps the dimensions separate.
 3. **No invented fact-check verdicts.** Claims get a *sourcing status*, not a true/false ruling.
-4. **Crowd Alignment measures prediction of consensus, not correctness.** (Replaced “agreement with the majority is not accuracy” on 2026-11-10.) Wherever it appears, say that a careful reader who correctly disagrees with the crowd scores lower.
+4. **Crowd Alignment is the ranking system.** Readers are ranked by how closely their ratings anticipate each article’s final community average. (User decision, 2026-11-12: the earlier “agreement with the majority is not accuracy” stance is abandoned. Don’t add disclaimers that undermine Crowd Alignment; the Methods page keeps factual limitations of community scores and the hedging weakness.)
 5. **Blind first.** Before you rate an open article, nothing may reveal its outlet, byline, sources, analysis or community result — anywhere in the app.
 6. **Repetition is not corroboration.** Several outlets citing one source = one source.
 7. **Institutional prestige ≠ correctness** of any individual claim.
@@ -193,7 +193,7 @@ the-media-lens/
   - adjusted error = (n·raw + `SHRINK_K`=5·cohort mean) / (n + 5);
   - score = 100 − adjusted error;
   - percentile = share of the cohort with larger adjusted error (ties half).
-- Status: < `PROVISIONAL_MIN`=5 eligible → unranked; < `RANK_MIN`=15 → provisional; else ranked. Tiers by percentile: Reader 0, Contributor 20, Analyst 40, Correspondent 60, Senior Correspondent 75, Editor 90, Fellow 97.
+- Status: < `PROVISIONAL_MIN`=5 eligible → unranked; < `RANK_MIN`=15 → provisional; else ranked. Tiers by percentile: Bronze 0, Silver 20, Gold 40, Platinum 60, Diamond 75, Master 90, Grandmaster 97.
 - The cohort = simulated participants scored by the same rules with leave-one-out means, recomputed (cached) whenever the set of closed articles changes.
 
 ### Data access (`services/api.js`)
@@ -243,7 +243,7 @@ Inspired by serious news design and data journalism; it should read as credible 
 2. **Read the relevant code before changing it**, and explain the planned approach before significant changes.
 3. **Preserve existing behaviour** unless the user explicitly asks to change it. Check every page that uses a component, data field or CSS class you touch (`grep` for it).
 4. **No major architectural change without explaining why and getting approval** — e.g. adding a router/state/CSS library, TypeScript, a backend, changing the route format, restructuring folders, or changing the localStorage shape.
-5. **Keep the product principles in §1.** In particular: never add an outlet-level rating, never present sample or simulated content as real, never invent fact-check verdicts, never present community scores or Crowd Alignment as correctness, never expose or use demographics.
+5. **Keep the product principles in §1.** In particular: never add an outlet-level rating, never present sample or simulated content as real, never invent fact-check verdicts, never present community scores as fact-checks, never expose or use demographics.
 6. **Blind-rating rule:** any new UI that shows an outlet, byline, link to the outlet, source, analysis or community number for an article must check `vis(article)` first. Search, filters and sorts must not let a sealed article be matched or ordered by outlet. After such a change, run the E2E test (its leak scan covers every page).
 7. **Sample data rules:** new content must be clearly hypothetical, attributed to real outlets only as sample, linked only to homepages, and varied within outlets. New articles need every field the UI reads (use `mk()` for lighter ones), an opaque `id`, a `ref`, a `crowd` entry and a `BODIES[ref]` text that never names the outlet. New source/claim ids must exist in their registries.
 8. **Route format:** page names without hyphens; hashes ASCII letters/digits/hyphens only.
@@ -262,7 +262,7 @@ Inspired by serious news design and data journalism; it should read as credible 
 
 - **All other participants are simulated.** No ratings are shared between people or devices; percentiles compare you with simulated participants.
 - **Rules run in the browser.** Windows, the daily Browse rule and blind hiding can be bypassed by clearing site data, changing the device clock or reading the page source. A real version needs a server.
-- **Crowd Alignment rewards hedging.** Measured on 2026-11-10: always answering 75 scored at about the 49th percentile of the simulated cohort, without reading anything. It also rewards predicting the crowd rather than being right (disclosed on Methods and Profile).
+- **Crowd Alignment rewards hedging.** Measured on 2026-11-10: always answering 75 scored at about the 49th percentile of the simulated cohort, without reading anything (disclosed on Methods).
 - **The five-point scale mixes bias, misleading presentation and factual accuracy** (user decision; disclosed on Methods).
 - **Blind rating is imperfect:** article text names some of its sources, and headline style can hint at an outlet.
 - **Demo timeline:** sample articles publish relative to your first visit, and the library runs out after about 2 days (Restart timeline resets it). With 30 articles, at most about 21 ratings can become eligible, so a permanent rank (15) needs most of them.

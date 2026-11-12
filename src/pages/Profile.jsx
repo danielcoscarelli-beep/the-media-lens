@@ -133,7 +133,7 @@ function Alignment({ al }) {
         <li><span>Percentile = share of the {al.cohort.size} ranked participants whose adjusted distance is larger than yours</span><strong className="tabular">{al.status === 'unranked' || al.percentile === null ? `— (needs ${PROVISIONAL_MIN})` : ord(al.percentile)}</strong></li>
       </ol>
       <CohortChart al={al} />
-      <p className="small callout"><Icon name="info" size={15} /><span>Crowd Alignment measures how well you anticipate the community’s eventual judgment. It doesn’t measure whether you were right: a careful reader who correctly disagrees with the crowd will score lower. <Link to="methods">Limitations</Link></span></p>
+      <p className="small callout"><Icon name="info" size={15} /><span>Crowd Alignment measures how closely your ratings anticipate the community’s final judgment of each article. The closer your ratings land to the final averages, the higher you rank. <Link to="methods">How it’s calculated</Link></span></p>
     </div>
   );
 }

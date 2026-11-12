@@ -112,8 +112,8 @@ test('visibility matrix', () => {
 });
 
 test('rank tiers, shrinkage and percentiles', () => {
-  assert.equal(A.tierFor(19.99).name, 'Reader'); assert.equal(A.tierFor(20).name, 'Contributor');
-  assert.equal(A.tierFor(96.9).name, 'Editor'); assert.equal(A.tierFor(97).name, 'Fellow');
+  assert.equal(A.tierFor(19.99).name, 'Bronze'); assert.equal(A.tierFor(20).name, 'Silver');
+  assert.equal(A.tierFor(96.9).name, 'Master'); assert.equal(A.tierFor(97).name, 'Grandmaster');
   assert.equal(A.nextTier(97), null);
   assert.equal(A.shrink(5, 10, 20), 15);                 // 5 ratings: halfway to the cohort mean
   assert.ok(Math.abs(A.shrink(45, 10, 20) - 11) < 1e-9);  // many ratings: close to own error

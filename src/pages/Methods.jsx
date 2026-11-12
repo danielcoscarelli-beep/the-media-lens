@@ -47,7 +47,7 @@ export default function Methods() {
         </ul>
 
         <h2>Crowd Alignment</h2>
-        <p>Crowd Alignment measures how closely your ratings anticipate the eventual community average, the “wisdom of the crowd”. For each article you rated, once its window closes:</p>
+        <p>Crowd Alignment is how The Media Lens ranks readers. It measures how closely your ratings anticipate each article’s final community average, the “wisdom of the crowd”. For each article you rated, once its window closes:</p>
         <ol>
           <li>Take the final average of <strong>everyone else’s</strong> ratings. Your own rating is always left out, so it can’t make you look more accurate.</li>
           <li>Your distance for that article = |your points − that average|.</li>
@@ -68,7 +68,6 @@ export default function Methods() {
         <ol>
           <li><strong>The scale mixes different questions.</strong> “Biased”, “Misleading” and “Nonfactual” are different judgments, about framing, about what a reader is left believing, and about whether claims are true. Putting them on one scale makes a single number possible, but a score of 40 can’t tell you which problem readers saw.</li>
           <li><strong>A community score is not a fact-check.</strong> It averages perceptions. A popular, mistaken belief can produce a confident score. The separate Facts &amp; evidence analysis describes sourcing; it doesn’t vote.</li>
-          <li><strong>Crowd Alignment rewards predicting the crowd, not being right.</strong> A careful reader who correctly disagrees with the majority ranks lower. It can also encourage guessing what others think instead of judging for yourself, and it can entrench whatever biases the crowd shares.</li>
           <li><strong>Hedging toward the middle is rewarded.</strong> Because most community averages fall between 60 and 90, someone who answers “Slightly Biased” on every article scores around the median of the simulated cohort without reading anything. A production system would need safeguards, such as comparing each person against a “constant answer” baseline.</li>
           <li><strong>Who rates matters.</strong> If the people rating an article aren’t representative, the average isn’t either. This prototype’s participants are simulated, so their averages reflect the simulation’s assumptions, not real readers.</li>
           <li><strong>The rules run in your browser.</strong> Windows, daily limits and Browse Mode are enforced on this device only. Clearing site data, changing the device clock or using another browser would get around them. A real version needs a server.</li>
