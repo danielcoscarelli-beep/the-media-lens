@@ -1,5 +1,5 @@
 // Publication registry. Note: no publication-level "bias" field exists by design.
-// Ratings in The Media Lens attach to individual articles, never to outlets.
+// Ratings in Vulgis attach to individual articles, never to outlets.
 export const publications = {
   nyt: { id: 'nyt', name: 'The New York Times', short: 'NYT', kind: 'Daily newspaper', homepage: 'https://www.nytimes.com' },
   fox: { id: 'fox', name: 'Fox News', short: 'FOX', kind: 'Cable & digital news', homepage: 'https://www.foxnews.com' },

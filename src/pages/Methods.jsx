@@ -12,7 +12,7 @@ export default function Methods() {
     <div className="page methods">
       <header className="page-head narrow">
         <div className="kicker">Methods &amp; limitations</div>
-        <h1 className="page-title">How The Media Lens works</h1>
+        <h1 className="page-title">How Vulgis works</h1>
         <p className="page-sub">This page explains what each number means, how it’s calculated, and what it can’t tell you.</p>
       </header>
       <article className="prose">
@@ -47,7 +47,7 @@ export default function Methods() {
         </ul>
 
         <h2>Crowd Alignment</h2>
-        <p>Crowd Alignment is how The Media Lens ranks readers. It measures how closely your ratings anticipate each article’s final community average, the “wisdom of the crowd”. For each article you rated, once its window closes:</p>
+        <p>Crowd Alignment is how Vulgis ranks readers. It measures how closely your ratings anticipate each article’s final community average, the “wisdom of the crowd”. For each article you rated, once its window closes:</p>
         <ol>
           <li>Take the final average of <strong>everyone else’s</strong> ratings. Your own rating is always left out, so it can’t make you look more accurate.</li>
           <li>Your distance for that article = |your points − that average|.</li>

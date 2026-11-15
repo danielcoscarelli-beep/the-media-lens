@@ -1,4 +1,4 @@
-# The Media Lens — prototype
+# Vulgis (formerly The Media Lens) — prototype
 
 A media-literacy platform for comparing how news organizations cover the same events, tracing claims to their sources, and evaluating headline framing. Front-end only; all content is hypothetical sample data.
 

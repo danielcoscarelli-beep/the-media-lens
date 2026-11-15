@@ -143,7 +143,7 @@ export default function Article() {
               {tab === 'facts' && (
                 <div className="tab-pane fade-in">
                   <h2 className="an-h">Facts and evidence</h2>
-                  <div className="callout small"><Icon name="info" size={15} /> <span><strong>No independent fact-check.</strong> The Media Lens has not checked these sample claims. Each claim shows the sourcing the article gives and what the cited record contains. This is separate from the community score, which is an average of readers’ perceptions.</span></div>
+                  <div className="callout small"><Icon name="info" size={15} /> <span><strong>No independent fact-check.</strong> Vulgis has not checked these sample claims. Each claim shows the sourcing the article gives and what the cited record contains. This is separate from the community score, which is an average of readers’ perceptions.</span></div>
                   <ul className="status-legend tiny">{Object.entries(CLAIM_STATUS).map(([k, s]) => <li key={k}><span className={`status status-${s.tone}`}>{s.label}</span> {s.help}</li>)}</ul>
                   <div className="claims">{claims.map((x, i) => <ClaimCard key={x.id} claim={x} index={i} onSource={openSource} />)}</div>
                 </div>

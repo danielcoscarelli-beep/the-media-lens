@@ -1,4 +1,6 @@
-# The Media Lens — project reference
+# Vulgis (formerly The Media Lens) — project reference
+
+> **Temporary name (2026-11-15):** the product is shown to users as **Vulgis** (domain vulgis.com). Internal identifiers keep the old name on purpose: the GitHub repo `the-media-lens`, the npm package name, `media-lens:*` localStorage keys (renaming them would wipe every visitor's saved ratings and timeline), build file names such as `the-media-lens.html`, and the `media-lens-developer` agent.
 
 This is the permanent reference for anyone (human or Claude) working on this codebase.
 The code is the source of truth. If this file and the code disagree, trust the code and update this file.
@@ -7,7 +9,7 @@ The code is the source of truth. If this file and the code disagree, trust the c
 
 ## 1. Purpose and vision
 
-The Media Lens is a **media-literacy platform**, not a news aggregator. It helps people become more
+Vulgis is a **media-literacy platform**, not a news aggregator. It helps people become more
 discerning news consumers by letting them:
 
 - **rate articles blind**, judging the headline and text before learning the outlet, its sources or other readers’ views;
