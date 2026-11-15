@@ -14,6 +14,7 @@ The permanent chronological record of how The Media Lens was built.
 **Entry template**
 
 ```
+
 ## YYYY-MM-DD: Short title
 **Status:** Completed | Partially completed | Failed / reverted | Proposed (not implemented)
 **Task / objective:** what was asked for and why
@@ -26,6 +27,18 @@ The permanent chronological record of how The Media Lens was built.
 ```
 
 ---
+
+## 2026-11-15: Temporary rename to Vulgis
+
+- **Date:** 2026-11-15
+- **Status:** Completed (not build-tested; see Testing)
+- **Task / objective:** Rename the product and prototype, for now, to **Vulgis** (the user owns vulgis.com) so it can be published under that name.
+- **Implementation:** Replaced every user-visible "The Media Lens" with "Vulgis": the page `<title>` (`index.html` and the single-file build head in `scripts/inline.mjs`), the header and footer wordmarks and the home-link `aria-label` (`src/components/Shell.jsx`), the footer disclaimer, the fact-check callout (`src/pages/Article.jsx`) and two Methods page sentences (`src/pages/Methods.jsx`). Code comments, the README title and CLAUDE.md now use the new name.
+- **Technical explanation:** Text-only changes. The old wordmark set "The" in italics through `.brand-the`; "Vulgis" has no article, so both wordmarks are now a single word, and the `.brand-the` CSS rule is unused but kept for an easy revert.
+- **Decision:** Internal identifiers are deliberately unchanged: the repo name, the npm package name, the `media-lens:*` localStorage keys (changing them would reset every visitor's ratings and timeline), the build file names and the developer agent name. The rename is temporary, and none of these are visible to users.
+- **Files:** `index.html`, `scripts/inline.mjs`, `src/components/Shell.jsx`, `src/pages/Article.jsx`, `src/pages/Methods.jsx`, `src/data/publications.js`, `src/lib/alignment.js`, `src/styles.css`, `README.md`, `CLAUDE.md`, `DEVELOPMENT_LOG.md`.
+- **Testing and results:** `npm ci` failed because the session had no access to the npm registry, so `npm test`, `npm run build` and the E2E test were **not run**. A grep confirmed that no user-visible "Media Lens" text remains in `src/`, `index.html` or `scripts/`.
+- **Limitations, open issues and follow-up:** Run `npm test`, `npm run build:single` and the E2E test before publishing. The published claude.ai artifact still shows the old name until it is rebuilt and republished.
 
 ## 2026-11-12: Reset the timeline and add three new hypothetical news events
 

@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CROWD ALIGNMENT and percentile ranks.
 //
-// Crowd Alignment is The Media Lens's measure of rating skill: how closely your ratings
+// Crowd Alignment is Vulgis's measure of rating skill: how closely your ratings
 // anticipate the eventual community average (the "wisdom of the crowd").
 //
 // Per article (only after its window closes):

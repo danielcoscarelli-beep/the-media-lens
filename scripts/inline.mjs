@@ -11,7 +11,7 @@ const jsSrc = html.match(/<script type="module"[^>]*src="\.\/(assets\/[^"]+\.js)
 const css = readFileSync(join(dist, cssHref), 'utf8');
 const js = readFileSync(join(dist, jsSrc), 'utf8').replace(/<\/script/gi, '<\\/script');
 
-const head = `<title>The Media Lens</title>
+const head = `<title>Vulgis</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Compare how news organizations cover the same events, trace sources, and evaluate headline framing.">
 <link rel="preconnect" href="https://fonts.googleapis.com">

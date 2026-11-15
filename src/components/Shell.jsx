@@ -42,9 +42,9 @@ export function NavBar() {
   return (
     <header className="topbar">
       <div className="topbar-inner">
-        <Link to="home" className="brand" aria-label="The Media Lens, home">
+        <Link to="home" className="brand" aria-label="Vulgis, home">
           <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11.5" fill="none" stroke="currentColor" strokeWidth="1.5" /><circle cx="13" cy="13" r="5.5" fill="none" stroke="var(--accent)" strokeWidth="1.5" /><path d="M1.5 13h6M18.5 13h6" stroke="currentColor" strokeWidth="1.5" /></svg>
-          <span className="brand-word"><span className="brand-the">The</span> Media Lens</span>
+          <span className="brand-word">Vulgis</span>
         </Link>
         <div className="topbar-search"><SearchBox /></div>
         <Link to="profile" className="userchip" title={ranked ? `Crowd Alignment percentile: ${Math.round(alignment.percentile)}` : 'Unranked: rate articles and wait for them to close'}>
@@ -82,7 +82,7 @@ export function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <div>
-          <div className="brand-word footer-brand"><span className="brand-the">The</span> Media Lens</div>
+          <div className="brand-word footer-brand">Vulgis</div>
           <p className="small muted">A media literacy platform for comparing how news organizations cover the same events. This prototype uses local sample data only.</p>
         </div>
         <div className="footer-cols">
@@ -90,7 +90,7 @@ export function Footer() {
           <div><h4>Participate</h4><Link to="ratings">Bias Ratings</Link><Link to="profile">My Profile</Link><Link to="methods">Methods &amp; limitations</Link></div>
         </div>
       </div>
-      <div className="footer-base small muted">Community scores are averages of readers’ perceptions of individual articles. They are not fact-checks, and The Media Lens does not rate publications as a whole.</div>
+      <div className="footer-base small muted">Community scores are averages of readers’ perceptions of individual articles. They are not fact-checks, and Vulgis does not rate publications as a whole.</div>
     </footer>
   );
 }
