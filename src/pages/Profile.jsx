@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { getArticle } from '../data/articles.js';
 import { publications } from '../data/publications.js';
-import { RATING_OPTIONS, optionForPoints } from '../data/ratingScale.js';
+import { nearestMark, SCALE_MARKS } from '../data/ratingScale.js';
+import { YourRating, trackPct } from '../components/Rating.jsx';
 import { TOPICS } from '../data/events.js';
 import { communityAt, finalOthers } from '../services/community.js';
 import { TIERS, MIN_CROWD, PROVISIONAL_MIN, RANK_MIN, SHRINK_K } from '../lib/alignment.js';
@@ -144,11 +145,11 @@ function History({ al }) {
   return (
     <ul className="history">
       {sorted.map((e) => {
-        const a = getArticle(e.rating.articleId); const o = optionForPoints(e.rating.points);
+        const a = getArticle(e.rating.articleId);
         return (
           <li key={a.id}>
             <div className="h-top">
-              <span className={`feed-rating r${RATING_OPTIONS.indexOf(o)}`}>{o.label} · {o.points}</span>
+              <YourRating points={e.rating.points} prefix="Your rating: " /><span className="tiny muted">{nearestMark(e.rating.points).label}</span>
               <span className="tiny muted">Rated {fmtDateTime(new Date(e.rating.submittedAt).getTime())}</span>
               <span className="tiny h-outcome">
                 {e.state === 'pending' && <>Scored when the window closes, in <Countdown until={windowFor(a.id).closesAt} done="moments" /></>}
@@ -174,20 +175,20 @@ function Trends() {
   }).filter((x) => x.mean !== null);
   if (!rows.length) return <EmptyState title="Nothing to compare yet">Rate a few articles to see how your ratings line up with everyone else’s.</EmptyState>;
   const avgDiff = rows.reduce((s, x) => s + (x.r.points - x.mean), 0) / rows.length;
-  const x = (v) => `${v}%`;
+  const x = (v) => `${trackPct(v)}%`;
   return (
     <div className="trends">
       <p className="trend-summary">On average your ratings are <strong>{Math.abs(avgDiff) < 3 ? 'about the same as' : `${Math.abs(avgDiff).toFixed(1)} points ${avgDiff > 0 ? 'higher (more favorable) than' : 'lower (more critical) than'}`}</strong> other readers’ averages. That on its own isn’t good or bad.</p>
       <div className="dumbbells">
-        <div className="db-axis"><span /><div className="db-scale">{['0 Nonfactual', '50 Biased', '100 Neutral'].map((l, i) => <span key={l} style={{ left: x(i * 50) }}>{l}</span>)}</div></div>
+        <div className="db-axis"><span /><div className="db-scale">{[1, 50, 100].map((p) => <span key={p} style={{ left: x(p) }}>{p} {SCALE_MARKS.find((m) => m.points === p).label}</span>)}</div></div>
         {rows.map(({ r, a, closed, mean }) => {
           const lo = Math.min(mean, r.points), hi = Math.max(mean, r.points);
           return (
             <div key={a.id} className="db-row">
               <Link to="article" param={a.id} className="db-name"><span className="pubmark pubmark-xs">{publications[a.pub].short}</span><Headline text={a.headline} /></Link>
               <div className="db-track">
-                {[0, 25, 50, 75, 100].map((g) => <span key={g} className="spread-grid" style={{ left: x(g) }} />)}
-                <span className="db-line" style={{ left: x(lo), width: `${hi - lo}%` }} />
+                {SCALE_MARKS.map((m) => <span key={m.points} className="spread-grid" style={{ left: x(m.points) }} />)}
+                <span className="db-line" style={{ left: x(lo), width: `${trackPct(hi) - trackPct(lo)}%` }} />
                 <span className={`db-comm ${closed ? '' : 'live'}`} style={{ left: x(mean) }} title={`${closed ? 'Final' : 'Live'} average of others: ${mean.toFixed(1)}`} />
                 <span className="db-you" style={{ left: x(r.points) }} title={`You: ${r.points}`} />
               </div>

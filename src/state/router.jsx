@@ -2,7 +2,7 @@
 // digits and hyphens only) so links stay shareable in restrictive embeds.
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
-export const PAGES = ['home', 'explore', 'compare', 'article', 'ratings', 'sources', 'profile', 'methods'];
+export const PAGES = ['home', 'explore', 'compare', 'article', 'ratings', 'profile', 'methods'];
 
 function parse() {
   const h = decodeURIComponent((window.location.hash || '').replace(/^#\/?/, ''));

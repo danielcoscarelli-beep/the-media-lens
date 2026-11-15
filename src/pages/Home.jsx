@@ -4,7 +4,6 @@ import { useAsync } from '../lib/useAsync.js';
 import { articles as allArticles, articlesForEvent } from '../data/articles.js';
 import { getEvent, featuredEvent, TOPICS } from '../data/events.js';
 import { publications } from '../data/publications.js';
-import { optionForPoints } from '../data/ratingScale.js';
 import { communityAt, simulatedActivity } from '../services/community.js';
 import { windowFor, isPublished } from '../lib/schedule.js';
 import { HOUR } from '../lib/clock.js';
@@ -14,17 +13,16 @@ import { Link } from '../state/router.jsx';
 import { useStore } from '../state/store.jsx';
 import { SearchBox } from '../components/Shell.jsx';
 import { EventCard } from '../components/Cards.jsx';
-import { ScoreBadge } from '../components/Rating.jsx';
+import { ScoreBadge, YourRating } from '../components/Rating.jsx';
 import { Countdown } from '../components/Status.jsx';
 import { Headline, Icon, SampleTag, SectionHead, Skeleton } from '../components/ui.jsx';
 
 const JOURNEY = [
   { key: 'searched', label: 'Search for a news event', to: 'explore', param: 'permitting' },
   { key: 'rated', label: 'Read an article and rate it blind', to: 'ratings' },
-  { key: 'rated', label: 'See the reveal: score, outlet and sources', to: 'ratings', alias: true },
+  { key: 'rated', label: 'See the reveal: score and outlet', to: 'ratings', alias: true },
   { key: 'ratedThree', label: 'Rate three articles today', to: 'ratings' },
   { key: 'compared', label: 'Compare how outlets covered the event', to: 'compare', param: 'permitting-act' },
-  { key: 'sources', label: 'Investigate an article’s sources', to: 'sources', param: 'permitting-act' },
   { key: 'browsed', label: 'Switch to Browse Mode', to: 'explore' },
   { key: 'profileViewed', label: 'Check your Crowd Alignment rank', to: 'profile' },
 ];
@@ -67,8 +65,7 @@ export default function Home() {
 
   const featuredList = articlesForEvent(featuredEvent.id).filter((a) => isPublished(a.id, now));
   const featuredSealed = featuredList.filter((a) => vis(a).sealed).length;
-  const featuredSources = new Set(featuredList.flatMap((a) => a.sourceUses.map((u) => u.id))).size;
-  const featuredClaims = new Set(featuredList.flatMap((a) => a.claims)).size;
+  const featuredScores = featuredSealed ? [] : featuredList.map((a) => communityAt(a.id, now, vis(a).rating).mean).filter((m) => m !== null);
 
   return (
     <div className="page home">
@@ -76,7 +73,7 @@ export default function Home() {
         <div className="hero-main">
           <div className="dateline">{today} · <SampleTag>Sample edition</SampleTag></div>
           <h1 className="hero-title">Judge the story first.<br /><em>Then see who wrote it.</em></h1>
-          <p className="hero-sub">Rate news articles blind, without knowing the outlet, its sources or what other readers think. Then the reveal: the community score, the publication, and how other outlets covered the same event.</p>
+          <p className="hero-sub">Rate news articles blind on a scale from 1 to 100, without knowing the outlet or what other readers think. Then the reveal: the community score, the publication, and how other outlets covered the same event.</p>
           <SearchBox size="lg" />
           <p className="small muted hero-try">Try: <Link to="explore" param="permitting">permitting bill</Link> · <Link to="explore" param="methane">methane</Link> · <Link to="explore" param="chips">AI chips</Link> · <Link to="explore" param="federal-reserve">Federal Reserve</Link></p>
         </div>
@@ -85,7 +82,7 @@ export default function Home() {
             <div className="kicker">Guided walkthrough</div>
             <span className="small tabular">{done}/{JOURNEY.length}</span>
           </div>
-          <h3 className="journey-title">Follow one story through the lens</h3>
+          <h3 className="journey-title">Follow one story from start to finish</h3>
           <p className="small muted">Uses the featured sample event: the Senate permitting bill.</p>
           <div className="journey-track"><span style={{ width: `${(done / JOURNEY.length) * 100}%` }} /></div>
           <ol className="journey-list">
@@ -153,7 +150,7 @@ export default function Home() {
       </section>
 
       <section className="block">
-        <SectionHead kicker="Coverage differences" title="One event, contrasting headlines">Highest, middle and lowest community scores within events whose ratings you can see. Highlighted words are the wording choices discussed in the analysis.</SectionHead>
+        <SectionHead kicker="Coverage differences" title="One event, contrasting headlines">Highest, middle and lowest community scores within events whose ratings you can see.</SectionHead>
         {contrasts.length ? (
           <div className="contrasts">
             {contrasts.map(({ ev, picks }) => (
@@ -164,7 +161,7 @@ export default function Home() {
                     <li key={a.id}>
                       <span className="pubmark pubmark-sm">{publications[a.pub].short}</span>
                       <div>
-                        <Link to="article" param={a.id} className="contrast-hl"><Headline text={a.headline} highlight /></Link>
+                        <Link to="article" param={a.id} className="contrast-hl"><Headline text={a.headline} /></Link>
                         <div className="small muted row-gap">{publications[a.pub].name} <ScoreBadge score={c.mean} n={c.n} final={vis(a).status === 'closed'} /></div>
                       </div>
                     </li>
@@ -183,10 +180,10 @@ export default function Home() {
           <p className="small live-line"><span className="pulse" aria-hidden="true" /> <strong className="tabular">{num(lastHour)}</strong> ratings submitted by simulated participants in the past hour <SampleTag>Simulated</SampleTag></p>
           <ul className="feed">
             {myRecent.map((r) => {
-              const a = allArticles.find((x) => x.id === r.articleId); const o = optionForPoints(r.points); const v = vis(a);
+              const a = allArticles.find((x) => x.id === r.articleId); const v = vis(a);
               return (
                 <li key={r.articleId} className="feed-item feed-you">
-                  <span className={`feed-rating r${[100, 75, 50, 25, 0].indexOf(r.points)}`}>{o.short} · {r.points}</span>
+                  <YourRating points={r.points} />
                   <div>
                     <div className="small"><strong>You</strong> · {fmtRelative(new Date(r.submittedAt).getTime(), now)} · {v.status === 'closed' ? 'closed' : <>closes in <Countdown until={v.closesAt} /></>}</div>
                     <Link to="article" param={a.id} className="feed-hl"><Headline text={a.headline} /></Link>
@@ -209,24 +206,23 @@ export default function Home() {
           </ul>
         </div>
         <aside className="featured-aside">
-          <div className="kicker">Featured analysis</div>
+          <div className="kicker">Featured event</div>
           <h3 className="fa-title">{featuredEvent.title}</h3>
           {featuredSealed > 0 ? (
             <>
-              <p className="small">{featuredSealed} of {featuredList.length} articles about this event are waiting for your blind rating. The side-by-side comparison of their framing unlocks once you’ve rated them or their windows close.</p>
+              <p className="small">{featuredSealed} of {featuredList.length} articles about this event are waiting for your blind rating. Their outlets and scores are revealed once you’ve rated them or their windows close.</p>
               <div className="fa-actions"><Link to="compare" param={featuredEvent.id} className="btn btn-primary btn-sm">Start rating</Link></div>
             </>
           ) : (
             <>
-              <p className="small">{featuredEvent.comparison.headline}</p>
+              <p className="small">{featuredEvent.summary}</p>
               <dl className="fa-stats">
                 <div><dt>Outlets compared</dt><dd className="tabular">{featuredList.length}</dd></div>
-                <div><dt>Distinct sources</dt><dd className="tabular">{featuredSources}</dd></div>
-                <div><dt>Claims traced</dt><dd className="tabular">{featuredClaims}</dd></div>
+                <div><dt>Lowest score</dt><dd className="tabular">{featuredScores.length ? Math.round(Math.min(...featuredScores)) : '—'}</dd></div>
+                <div><dt>Highest score</dt><dd className="tabular">{featuredScores.length ? Math.round(Math.max(...featuredScores)) : '—'}</dd></div>
               </dl>
               <div className="fa-actions">
                 <Link to="compare" param={featuredEvent.id} className="btn btn-primary btn-sm">Open comparison</Link>
-                <Link to="sources" param={featuredEvent.id} className="btn btn-ghost btn-sm">Source map</Link>
               </div>
             </>
           )}

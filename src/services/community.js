@@ -14,7 +14,7 @@
 // A real backend would replace this module with API calls that return the same shapes.
 // ─────────────────────────────────────────────────────────────────────────────
 import { articles, getArticle } from '../data/articles.js';
-import { POINT_VALUES } from '../data/ratingScale.js';
+import { clampPoints } from '../data/ratingScale.js';
 import { windowFor, WINDOW_MS } from '../lib/schedule.js';
 import { summarize } from '../lib/stats.js';
 
@@ -24,7 +24,8 @@ export const SIM_PARTICIPANTS = 300;
 function seedOf(str) { let h = 1779033703 ^ str.length; for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); } return h >>> 0; }
 function rng(seed) { let a = seedOf(seed); return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function gauss(r) { const u = Math.max(r(), 1e-12), v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
-const snap = (x) => POINT_VALUES.reduce((best, p) => (Math.abs(p - x) < Math.abs(best - x) ? p : best), 100);
+// Simulated readers use the slider too: any whole number 1–100.
+const snap = clampPoints;
 
 let participantsCache = null;
 /** The simulated cohort. Labels make clear these are not real people. */

@@ -8,7 +8,7 @@ import { fmtDateTime, fmtRelative } from '../lib/format.js';
 import { Link } from '../state/router.jsx';
 import { useStore } from '../state/store.jsx';
 import ArticleImage from './ArticleImage.jsx';
-import { DistributionBar, ScoreBadge } from './Rating.jsx';
+import { ScoreBadge } from './Rating.jsx';
 import { SealedPub, StatusBadge } from './Status.jsx';
 import { Headline, Icon, LabelBadge, PubName } from './ui.jsx';
 
@@ -45,7 +45,6 @@ export function ArticleCard({ article, variant = 'row', showEvent = false }) {
             </>
           )}
         </div>
-        {variant === 'row' && c && c.n > 0 && <DistributionBar dist={c.dist} compact highlightPoints={v.rating?.points ?? null} />}
       </div>
     </article>
   );
@@ -53,7 +52,7 @@ export function ArticleCard({ article, variant = 'row', showEvent = false }) {
 
 /** Event card. Outlet lists appear only when no article in the event is sealed for this reader. */
 export function EventCard({ event, articles, lead = false }) {
-  const { vis, now } = useStore();
+  const { vis } = useStore();
   const vs = articles.map((a) => vis(a));
   const sealed = articles.filter((_, i) => vs[i].sealed);
   const anySealed = sealed.length > 0;

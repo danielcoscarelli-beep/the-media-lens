@@ -9,7 +9,6 @@ const NAV = [
   { page: 'explore', label: 'Explore News' },
   { page: 'compare', label: 'Compare Coverage' },
   { page: 'ratings', label: 'Bias Ratings' },
-  { page: 'sources', label: 'Source Explorer' },
   { page: 'profile', label: 'My Profile' },
 ];
 
@@ -70,7 +69,7 @@ export function SampleBanner() {
     <div className="sample-banner" role="note">
       <div className="sample-banner-inner">
         <Icon name="info" size={15} />
-        <p><strong>Prototype with sample content.</strong> All headlines, articles and sources are hypothetical, and other participants and their ratings are simulated. Nothing here is real reporting by the publications named, and nothing has been independently fact-checked. <Link to="methods">How this works</Link></p>
+        <p><strong>Prototype with sample content.</strong> All headlines and articles are hypothetical, and other participants and their ratings are simulated. Nothing here is real reporting by the publications named, and nothing has been independently fact-checked. <Link to="methods">How this works</Link></p>
         <button className="icon-btn" aria-label="Dismiss notice" onClick={() => { setHide(true); try { sessionStorage.setItem('ml-banner', '1'); } catch { /* ignore */ } }}><Icon name="close" size={14} /></button>
       </div>
     </div>
@@ -86,7 +85,7 @@ export function Footer() {
           <p className="small muted">A media literacy platform for comparing how news organizations cover the same events. This prototype uses local sample data only.</p>
         </div>
         <div className="footer-cols">
-          <div><h4>Read</h4><Link to="explore">Explore News</Link><Link to="compare">Compare Coverage</Link><Link to="sources">Source Explorer</Link></div>
+          <div><h4>Read</h4><Link to="explore">Explore News</Link><Link to="compare">Compare Coverage</Link></div>
           <div><h4>Participate</h4><Link to="ratings">Bias Ratings</Link><Link to="profile">My Profile</Link><Link to="methods">Methods &amp; limitations</Link></div>
         </div>
       </div>

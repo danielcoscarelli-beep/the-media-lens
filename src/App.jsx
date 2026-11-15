@@ -8,11 +8,10 @@ import Explore from './pages/Explore.jsx';
 import Compare from './pages/Compare.jsx';
 import Article from './pages/Article.jsx';
 import BiasRatings from './pages/BiasRatings.jsx';
-import SourceExplorer from './pages/SourceExplorer.jsx';
 import Profile from './pages/Profile.jsx';
 import Methods from './pages/Methods.jsx';
 
-const PAGES = { home: Home, explore: Explore, compare: Compare, article: Article, ratings: BiasRatings, sources: SourceExplorer, profile: Profile, methods: Methods };
+const PAGES = { home: Home, explore: Explore, compare: Compare, article: Article, ratings: BiasRatings, profile: Profile, methods: Methods };
 
 function Routes() {
   const { page, param } = useRouter();

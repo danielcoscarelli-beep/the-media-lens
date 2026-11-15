@@ -70,23 +70,3 @@ export function eventPublishedAt(eventId) {
 export function boundaries() {
   return [...windows().values()].flatMap((w) => [w.opensAt, w.closesAt]);
 }
-
-// Sample source documents carry fixed sample dates written relative to each event's original
-// sample date (events.js `date`). Shift them by the same amount the event moved on this timeline,
-// so a press release still appears on the day of the vote, not weeks earlier.
-let sourceEventMap = null;
-function eventForSource(sourceId) {
-  if (!sourceEventMap) {
-    sourceEventMap = new Map();
-    for (const a of articles) for (const u of a.sourceUses) if (!sourceEventMap.has(u.id)) sourceEventMap.set(u.id, a.eventId);
-  }
-  return sourceEventMap.get(sourceId);
-}
-export function shiftedSourceDate(sourceId, isoDate) {
-  const ev = events.find((e) => e.id === eventForSource(sourceId));
-  if (!ev || !isoDate) return null;
-  const [y, m, d] = ev.date.split('-').map(Number);
-  const shift = eventPublishedAt(ev.id) - new Date(y, m - 1, d, 12).getTime();
-  const [sy, sm, sd] = isoDate.split('-').map(Number);
-  return new Date(sy, sm - 1, sd, 12).getTime() + shift;
-}
