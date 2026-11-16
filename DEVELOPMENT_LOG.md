@@ -28,6 +28,21 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Record the two-question decision and prediction design notes
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's acceptance of two questions per article and Walter's answer on
+readers projecting their own rating onto the crowd.
+**Implementation:** Updated `docs/team/walter/memory.md` (decision register, Q8 design notes,
+session log).
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** Whether accurate predictions count toward the rank is
+undecided. Daniel has not yet agreed to the change of what the rank measures.
+
+---
+
 ## 2026-11-16: Pause ORD-0001; record the crowd-only principle
 
 **Status:** Completed (documentation only)

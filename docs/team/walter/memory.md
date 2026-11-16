@@ -34,6 +34,7 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-16 | **Two questions per article accepted:** an honest rating plus a prediction of how readers will rate | M | Fourth session of 2026-11-16; enables the "surprisingly popular" design (Q8) |
 | 2026-11-16 | **Crowd only.** Vulgis relies on the crowd alone: no platform-produced content (rules out calibration articles), no expert panels, no outside verdicts as the yardstick. Reason: any producer brings its own biases | M | Third session of 2026-11-16. Rules out Q8 options A, C and D |
 | 2026-11-16 | **ORD-0001 paused** (On hold) | M | The two-factor rank still measures anticipation of the crowd |
 | 2026-11-16 | **M's position on the rank's purpose:** the rank should recognize readers who judge an article's neutrality and factuality well, not readers who anticipate the crowd. The crowd's job is to find such articles. This reverses Daniel's 2026-11-12 decision (`CLAUDE.md` §1.4) | M (not yet agreed with Daniel) | M, second session of 2026-11-16. Walter recommends calibration articles as the measure (see Q8) and pausing ORD-0001 |
@@ -113,6 +114,18 @@ that genuinely promotes the Wisdom of the Crowd**.
    articles), which penalizes constant answers but resists herding less. Implication: with crowd
    only, **who the crowd is (Q5) becomes the decisive risk**, because nothing can correct a
    one-sided crowd.
+   _Design notes (2026-11-16, M asked whether readers will just project their own rating):_
+   projection (the "false consensus effect") is expected and is what the method relies on:
+   holders of each view over-predict it, so the scoring compares actual shares with the
+   **average** prediction across all readers. A reader who copies their rating into the
+   prediction loses nothing on the Insight score, but if everyone did, predictions would carry no
+   information. Countermeasures: (1) ask the prediction in a **different format** from the rating,
+   e.g. "What share of readers will rate this Biased or worse?" (a percentage, which also turns the
+   scoring into a simple yes/no question); (2) ask it after the rating, which then locks; (3) give
+   a **small reward for accurate predictions** (the BTS prediction score), either inside the rank
+   with a low weight or as a separate "Forecast" badge, which is M's call because it rewards
+   anticipating the crowd, though separately from the honest rating; (4) after the window closes,
+   show "you expected X%, it was Y%", which teaches readers how far their bubble extends.
 8. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
@@ -135,3 +148,6 @@ that genuinely promotes the Wisdom of the Crowd**.
 - 2026-11-16 (later) — M paused ORD-0001 and set the crowd-only principle, ruling out calibration
   articles. Walter recommended the "surprisingly popular" two-question design (Q8) and flagged crowd
   diversity (Q5) as the decisive risk. Awaiting M's view on the second question per article.
+- 2026-11-16 (later) — M accepted two questions per article and asked about projection. Walter
+  explained that projection is built into the method and proposed four countermeasures (Q8 design
+  notes). Open for M: whether accurate predictions earn a small part of the rank or a separate badge.
