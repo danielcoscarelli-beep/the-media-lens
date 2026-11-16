@@ -28,6 +28,28 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Walter session on herding; issue ORD-0001 (two-factor Crowd Alignment)
+
+**Status:** Completed (documentation only; the order itself is not implemented yet)
+**Task / objective:** Record M's decision to implement a two-factor Crowd Alignment (accuracy +
+ordering) and hand it to Steve as a development order. Record Walter's analysis of whether it also
+addresses herding.
+**Implementation:** Created the first development order and updated Walter's memory (decision
+register, assumptions A5–A6, open questions Q2 and Q4, orders issued, session log) and the order index.
+**Technical explanation:** No code changed. ORD-0001 specifies the ordering measure (pairwise order
+agreement with ties counted as half), small-sample shrinkage, a standardized combination with
+accuracy, and testable acceptance criteria, including constant-answer readers ranking below the 10th
+percentile.
+**Decision:** M decided to implement the two-factor rank (2026-11-16). It needs Daniel's approval to
+merge because it changes what the rank means (`CLAUDE.md` §1.4, §9).
+**Files:** Created `docs/team/orders/ORD-0001-two-factor-crowd-alignment.md`. Modified
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** Walter's view is that the two-factor rank fixes hedging
+but not herding; a phase-2 "predict the crowd" question is proposed in Q2 and not yet decided.
+
+---
+
 ## 2026-11-16: Add the Walter (strategy) and Steve (development) agents with permanent memory
 
 **Status:** Completed

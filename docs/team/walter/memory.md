@@ -3,7 +3,7 @@
 Business strategy memory for Vulgis. Read in full at the start of every session; update at the end.
 Never delete history: mark superseded entries and add new ones.
 
-_Last updated: 2026-11-16 (created)._
+_Last updated: 2026-11-16 (first strategy session: herding and the two-factor ranking)._
 
 ## Mission (from M, 2026-11-16)
 
@@ -34,6 +34,7 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-16 | **Two-factor Crowd Alignment**: rank = accuracy (closeness to the crowd's final average) + ordering (same order as the crowd), standardized and combined. Issued as ORD-0001 | M (Daniel's approval pending; memo sent 2026-11-15) | Removes the reward for constant answers. Walter's caveat: it fixes hedging but **not** herding (see Q2) |
 
 ## Assumptions register
 
@@ -43,6 +44,8 @@ that genuinely promotes the Wisdom of the Crowd**.
 | A2 | A rank (Crowd Alignment) motivates sustained rating | Untested | Retention of ranked vs. unranked users |
 | A3 | Rewarding agreement with the crowd's final average still yields independent, honest ratings | **Doubtful** | See open question Q2 |
 | A4 | Enough readers per article can be reached within a 24-hour window | Untested | Model of traffic per article vs. required sample size (Q3) |
+| A5 | Adding an ordering measure removes the reward for constant answers | Supported (simulation, old 5-point scale, 2026-11-15) | Re-run on the 1–100 slider as part of ORD-0001 |
+| A6 | The two-factor rank also removes the incentive to herd | **Refuted by reasoning** (2026-11-16) | Both factors still score agreement with the crowd, so reporting the crowd's expected view beats reporting one's own whenever the two differ. Test with real users: compare rating spread of ranked vs. unranked readers |
 
 ## Open questions (highest priority first)
 
@@ -56,6 +59,17 @@ that genuinely promotes the Wisdom of the Crowd**.
    question (Bayesian Truth Serum–style), reward calibration or discrimination rather than
    closeness, or reward participation and consistency instead of agreement. Needs a decision from
    the partners because it touches `CLAUDE.md` §1.4.
+   _2026-11-16 update:_ M asked whether the two-factor rank (ORD-0001) resolves this. Walter's view:
+   no. It removes lazy hedging but still rewards matching the crowd, now on order as well as level.
+   Blind rating protects against social influence but not against the *incentive* to guess others.
+   The distortion hits readers who see themselves as atypical, which is the diversity the crowd
+   needs. **Walter's recommendation (not yet decided):** phase 2 = two questions per article,
+   "your rating" (feeds the community score, never scored) and "what will readers say?" (scored by
+   the two-factor Crowd Alignment). That keeps Crowd Alignment as the ranking system (§1.4) while
+   keeping the community score honest. It also enables the "surprisingly popular" method (Prelec,
+   Seung & McCoy, Nature 2017). Costs: one extra input per article and a risk that readers anchor
+   their own rating on their prediction. Decide before the backend is built, and A/B test with real
+   users if possible.
 3. **Q3 — What does "statistically significant" mean here, and how many ratings per article does
    it take?** Working estimate: margin of error ≈ 1.96 × SD / √n. With an assumed SD of 20 points on
    the 1–100 scale, ±5 points needs ≈ 61 ratings and ±3 points ≈ 171. Real SD is unknown until a
@@ -65,6 +79,8 @@ that genuinely promotes the Wisdom of the Crowd**.
    44th percentile of the simulated cohort. A memo (2026-11-15, written for the old 5-point scale)
    proposed adding an "ordering" measure: did the reader rank articles in the same order as the
    crowd? It needs re-running on the slider before it goes to Daniel.
+   _2026-11-16:_ **Decided by M; addressed by ORD-0001**, pending Daniel's approval. The slider
+   re-run is part of the order.
 5. **Q5 — Sample bias and manipulation.** Who rates determines the average. How to keep the crowd
    diverse (not one political side), and how to resist brigading, bots and multiple accounts?
 6. **Q6 — Content and licensing.** Showing real publications' articles needs a legal approach
@@ -74,9 +90,13 @@ that genuinely promotes the Wisdom of the Crowd**.
 
 ## Development orders issued
 
-None yet. See `docs/team/orders/README.md`.
+- ORD-0001 — Two-factor Crowd Alignment (accuracy + ordering), P1, issued 2026-11-16, needs
+  Daniel's approval to merge. See `docs/team/orders/README.md`.
 
 ## Session log
 
 - 2026-11-16 — Memory created with the mission, current state and initial open questions. No
   strategy session held yet.
+- 2026-11-16 — First session with M, on herding. M decided to implement the two-factor rank;
+  ORD-0001 issued. Walter argued it fixes hedging but not herding (A6) and recommended a phase-2
+  "predict the crowd" question (Q2). Next: M's view on phase 2; Daniel's response to the memo.

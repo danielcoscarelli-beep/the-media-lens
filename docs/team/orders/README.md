@@ -20,7 +20,7 @@ Each order is one file, `ORD-NNNN-short-title.md`, numbered in sequence and neve
 
 | Order | Title | Priority | Status | Issued | PR |
 |---|---|---|---|---|---|
-| — | _No orders yet_ | | | | |
+| [ORD-0001](ORD-0001-two-factor-crowd-alignment.md) | Two-factor Crowd Alignment (accuracy + ordering) | P1 | Issued (needs Daniel's approval to merge) | 2026-11-16 | |
 
 ## Template
 
