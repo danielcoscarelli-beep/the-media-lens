@@ -1,6 +1,6 @@
 # ORD-0001: Two-factor Crowd Alignment (accuracy + ordering)
 
-**Status:** Issued
+**Status:** On hold (paused by M on 2026-11-16: M wants the rank to reward judgment of neutrality and factuality, not anticipation of the crowd; see Walter's memory Q8). Do not start.
 **Priority:** P1 (urgent)
 **Issued by:** Walter, agreed with M on 2026-11-16
 **Source decision:** `docs/team/walter/memory.md`, Decision register, 2026-11-16 ("Two-factor Crowd Alignment")

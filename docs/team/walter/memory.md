@@ -34,6 +34,8 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-16 | **Crowd only.** Vulgis relies on the crowd alone: no platform-produced content (rules out calibration articles), no expert panels, no outside verdicts as the yardstick. Reason: any producer brings its own biases | M | Third session of 2026-11-16. Rules out Q8 options A, C and D |
+| 2026-11-16 | **ORD-0001 paused** (On hold) | M | The two-factor rank still measures anticipation of the crowd |
 | 2026-11-16 | **M's position on the rank's purpose:** the rank should recognize readers who judge an article's neutrality and factuality well, not readers who anticipate the crowd. The crowd's job is to find such articles. This reverses Daniel's 2026-11-12 decision (`CLAUDE.md` §1.4) | M (not yet agreed with Daniel) | M, second session of 2026-11-16. Walter recommends calibration articles as the measure (see Q8) and pausing ORD-0001 |
 | 2026-11-16 | **Two-factor Crowd Alignment**: rank = accuracy (closeness to the crowd's final average) + ordering (same order as the crowd), standardized and combined. Issued as ORD-0001 | M (Daniel's approval pending; memo sent 2026-11-15) | Removes the reward for constant answers. Walter's caveat: it fixes hedging but **not** herding (see Q2) |
 
@@ -99,6 +101,18 @@ that genuinely promotes the Wisdom of the Crowd**.
    from unscored honest ratings, and later skill-weighted community scores. Tension: calibration
    items are platform-authored, so they must be clearly disclosed and never applied to real
    outlets' articles (`CLAUDE.md` §1.2). Needs Daniel.
+   _Later 2026-11-16:_ **M ruled out (a), (c) and (d): crowd only.** Walter's revised
+   recommendation is (b) in its "surprisingly popular" form: each reader gives an honest rating and
+   a prediction of how readers will rate. The community score uses only the honest ratings. The
+   reader rank (working name "Insight") rewards honest answers that turn out **more common than the
+   crowd predicted** (Bayesian Truth Serum information score, Prelec 2004). Echoing the expected
+   majority earns about zero, so honesty is the best strategy. Open sub-questions: accept a second
+   question per article; score on the slider grouped into its five labeled bands; minimum ratings
+   per article for a stable score; how to explain it simply. A fallback with one question is
+   peer-consistency scoring (agreement with others on the same article minus agreement on unrelated
+   articles), which penalizes constant answers but resists herding less. Implication: with crowd
+   only, **who the crowd is (Q5) becomes the decisive risk**, because nothing can correct a
+   one-sided crowd.
 8. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
@@ -118,3 +132,6 @@ that genuinely promotes the Wisdom of the Crowd**.
   judgment of neutrality and factuality. Walter opened Q8 (measuring judgment without an answer
   key), recommended calibration articles, and recommended pausing ORD-0001 pending M's and
   Daniel's decision. Awaiting M's answer on pausing and on a proposal for Daniel.
+- 2026-11-16 (later) — M paused ORD-0001 and set the crowd-only principle, ruling out calibration
+  articles. Walter recommended the "surprisingly popular" two-question design (Q8) and flagged crowd
+  diversity (Q5) as the decisive risk. Awaiting M's view on the second question per article.

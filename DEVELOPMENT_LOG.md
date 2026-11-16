@@ -28,6 +28,22 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Pause ORD-0001; record the crowd-only principle
+
+**Status:** Completed (documentation only)
+**Task / objective:** M paused ORD-0001 and decided Vulgis relies on the crowd alone (no
+platform-produced calibration content, expert panels or outside verdicts).
+**Implementation:** ORD-0001 status set to `On hold`; `On hold` added to the order status table;
+Walter's memory updated (decision register, Q8 revised recommendation, session log).
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/orders/ORD-0001-two-factor-crowd-alignment.md`,
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** `CLAUDE.md` is unchanged until Daniel agrees, since
+the crowd-only principle and the rank's purpose affect §1.
+
+---
+
 ## 2026-11-16: Walter session on what the reader rank should measure
 
 **Status:** Completed (documentation only)

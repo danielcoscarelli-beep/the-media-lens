@@ -14,13 +14,14 @@ Each order is one file, `ORD-NNNN-short-title.md`, numbered in sequence and neve
 | `Awaiting approval` | Built or proposed; waiting for Daniel's PR review or decision | Steve |
 | `Done` | Acceptance criteria met, verified and merged | Steve |
 | `Blocked` | Cannot proceed; reason in the file | Steve |
+| `On hold` | Paused by M or Walter; Steve must not start or continue; reason in the file | Walter or M |
 | `Cancelled` | No longer wanted; reason in the file | Walter or M |
 
 ## Index
 
 | Order | Title | Priority | Status | Issued | PR |
 |---|---|---|---|---|---|
-| [ORD-0001](ORD-0001-two-factor-crowd-alignment.md) | Two-factor Crowd Alignment (accuracy + ordering) | P1 | Issued (needs Daniel's approval to merge) | 2026-11-16 | |
+| [ORD-0001](ORD-0001-two-factor-crowd-alignment.md) | Two-factor Crowd Alignment (accuracy + ordering) | P1 | **On hold** (paused by M, 2026-11-16) | 2026-11-16 | |
 
 ## Template
 
