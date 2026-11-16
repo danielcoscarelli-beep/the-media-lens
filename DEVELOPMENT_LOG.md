@@ -28,6 +28,48 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Add the Walter (strategy) and Steve (development) agents with permanent memory
+
+**Status:** Completed
+**Task / objective:** M asked for two agents to support development on M's side of the partnership:
+**Walter**, a senior business strategist who questions assumptions and develops the business model,
+incentives and dynamics (legal form, for-profit or not, still undecided), and **Steve**, a developer
+who takes development orders from Walter, documents at corporate standards and builds toward a
+platform for millions of users on AWS or Azure, optimized for desktop and mobile. Both need
+permanent memory.
+**Implementation:** Added two agent definitions, one memory file per agent, a development-order
+system for the Walter → Steve hand-off, and an architecture folder for ADRs. Updated `CLAUDE.md`
+§4 and §11 to describe them. No application code changed.
+**Technical explanation:** Claude Code loads agent definitions from `.claude/agents/*.md` (YAML
+front matter with `name`, `description`, `model`, then the instructions). Agents cannot call each
+other, so Walter writes orders as files in `docs/team/orders/` and Steve reads them; each order
+carries a status, acceptance criteria and Steve's record of the work. "Permanent memory" is a
+Markdown file per agent that the agent reads at the start of a session and updates, commits and
+pushes at the end, because the cloud workspace is wiped between sessions. Walter's memory was
+seeded with the mission, the decision history from `CLAUDE.md` and this log, an assumptions
+register and seven open questions; Steve's with the current technical state, deployment setup and
+environment quirks.
+**Decision:** Steve works alongside Daniel's `media-lens-developer` agent and follows its rules
+rather than replacing it (M's choice, 2026-11-16). The agents live in this repository, delivered by
+pull request for Daniel's approval, rather than only in M's fork (M's choice), so they load in any
+session on the project and Daniel can see decisions and orders. Alternatives: account-level skills
+(not tied to the repo and unable to hold memory) and fork-only files (would drift from Daniel's repo).
+**Files:**
+- Created: `.claude/agents/walter.md`, `.claude/agents/steve.md`, `docs/team/README.md`,
+  `docs/team/walter/memory.md`, `docs/team/steve/memory.md`, `docs/team/orders/README.md`,
+  `docs/architecture/README.md`, `docs/architecture/adr/README.md`
+- Modified: `CLAUDE.md` (§4 project structure, §11 records table), `DEVELOPMENT_LOG.md` (this entry)
+**Testing and results:** Documentation-only change. Checked that both agent files have valid front
+matter (`name`, `description`, `model`) in the same format as `media-lens-developer.md`. Did not run
+`npm test` or the build because no code changed. Did not invoke the agents in a new session; they
+load when a session starts on a checkout that contains them.
+**Limitations, open issues and follow-up:** Memory persists only when the agents commit and push.
+Two people working the same memory file in parallel could produce merge conflicts. Walter's open
+question Q2 (whether ranking by agreement with the crowd encourages herding) and Q4 (re-running
+the hedging proposal on the 1–100 slider) are proposed next topics.
+
+---
+
 ## 2026-11-15: Slider rating (1–100), single colored scores, and removal of sourcing and framing analysis
 
 - **Date:** 2026-11-15

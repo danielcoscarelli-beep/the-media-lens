@@ -87,7 +87,10 @@ the-media-lens/
 ├── tests/
 │   ├── unit/rating-system.test.mjs   Scale, averages, windows, modes, visibility, alignment (node:test)
 │   └── e2e/rating-flow.e2e.cjs       Browser test incl. an app-wide leak scan (needs Playwright)
-├── .claude/agents/         Project agent definitions
+├── .claude/agents/         Project agent definitions (media-lens-developer, walter, steve)
+├── docs/
+│   ├── team/               Walter and Steve: team README, permanent memory files, development orders
+│   └── architecture/       Architecture overview and ADRs (Architecture Decision Records)
 └── src/
     ├── main.jsx            Mounts <App/>, imports styles.css
     ├── App.jsx             Providers + shell (NavBar, ModeBar, SampleBanner) + page switch
@@ -280,13 +283,17 @@ Inspired by serious news design and data journalism; it should read as credible 
 
 ## 11. Documentation, development log and reporting
 
-The project keeps three kinds of written record. Each has a different job:
+The project keeps these written records. Each has a different job:
 
 | File | Job | How it changes |
 |---|---|---|
 | `CLAUDE.md` | Describes the project **as it is now**: vision, architecture, features, rules, limitations. | Edited in place whenever reality changes, so it stays current. |
 | `DEVELOPMENT_LOG.md` | Records **how the project got here**: what was done, when, why, and how it was tested. | Append-only. Each new entry goes at the top; earlier entries are never erased or rewritten. |
 | `.claude/agents/media-lens-developer.md` | Defines **how the developer agent works**: its role, rules and reporting duties. | Edited when the way of working changes. |
+| `.claude/agents/walter.md`, `.claude/agents/steve.md` | M's agents (added 2026-11-16): **Walter**, business strategist, and **Steve**, developer, who follows this file and the developer agent's rules. See `docs/team/README.md`. | Edited when their roles change. |
+| `docs/team/walter/memory.md`, `docs/team/steve/memory.md` | Each agent's **permanent memory**: decisions, assumptions, open questions, state, session log. | Read at the start and updated at the end of each agent session; history is kept, not deleted. |
+| `docs/team/orders/` | **Development orders** from Walter to Steve, with status and Steve's record of the work. | One file per order; index in its README. |
+| `docs/architecture/` | Architecture overview and **ADRs** for significant technical decisions. | ADRs are never rewritten once accepted; superseded by new ones. |
 
 A **development task** is any work that creates, modifies or deletes project files (code, styles, data, config, build scripts, or documentation). Questions and investigations that change no files are not development tasks.
 
