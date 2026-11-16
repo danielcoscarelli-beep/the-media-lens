@@ -8,7 +8,15 @@ a later ADR replaces it. Files are numbered `NNNN-short-title.md`.
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
-| — | _No ADRs yet_ | | |
+| [0001](0001-aws-as-cloud.md) | AWS as the cloud provider | Proposed | 2026-11-16 |
+| [0002](0002-authentication-and-login.md) | Authentication and login methods | Proposed | 2026-11-16 |
+| [0003](0003-account-integrity.md) | Account integrity (fake and duplicate accounts) | Proposed | 2026-11-16 |
+| [0004](0004-database.md) | Database: PostgreSQL on Aurora Serverless v2 | Proposed | 2026-11-16 |
+| [0005](0005-api-layer.md) | API layer and server-side rules | Proposed | 2026-11-16 |
+| [0006](0006-frontend-hosting-and-api-migration.md) | Front-end hosting and the move from mocks to the API | Proposed | 2026-11-16 |
+| [0007](0007-headline-ingestion.md) | Headline ingestion and event grouping | Proposed | 2026-11-16 |
+| [0008](0008-rating-flow-and-reading-at-source.md) | Rating flow (headline first) and reading at the source | Proposed | 2026-11-16 |
+| [0009](0009-admin-interface.md) | Admin interface: approach and security | Proposed | 2026-11-16 |
 
 Status values: `Proposed`, `Accepted`, `Rejected`, `Superseded by NNNN`.
 

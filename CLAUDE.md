@@ -90,7 +90,8 @@ the-media-lens/
 ├── .claude/agents/         Project agent definitions (media-lens-developer, walter, steve)
 ├── docs/
 │   ├── team/               Walter and Steve: team README, permanent memory files, development orders
-│   └── architecture/       Architecture overview and ADRs (Architecture Decision Records)
+│   ├── architecture/       Architecture overview, ADRs (Architecture Decision Records), admin screen list
+│   └── privacy/            US privacy and legal requirements checklist (proposed, 2026-11-16)
 └── src/
     ├── main.jsx            Mounts <App/>, imports styles.css
     ├── App.jsx             Providers + shell (NavBar, ModeBar, SampleBanner) + page switch

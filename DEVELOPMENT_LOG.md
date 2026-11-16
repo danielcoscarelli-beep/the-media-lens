@@ -28,6 +28,47 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Architecture proposal for accounts, database, headline ingestion and admin (ORD-0002, ORD-0003)
+
+**Status:** Proposed (not implemented). Documentation only; no code changed, nothing built or provisioned.
+**Task / objective:** Steve's proposals for ORD-0002 (accounts, login, profiles, database, headline
+ingestion on AWS) and ORD-0003 (admin interface), within M's decisions: US only, AWS, headlines plus
+a link to the source, an admin interface; and, decided during the work, headline-first blind rating
+(Q10), low-friction layered account integrity (Q9), and a login gate as the first milestone.
+**Implementation:** Wrote nine ADRs (0001–0009, all `Proposed`), the proposed target architecture
+in `docs/architecture/README.md` (components, draft data model, scale path at 1k/100k/1M MAU,
+monthly AWS cost estimates with assumptions and sources, phased build plan), an admin screen
+list, and a US privacy and legal checklist. Updated both orders, the order index, Steve's memory
+and the `CLAUDE.md` structure tree.
+**Technical explanation:** Proposed stack: S3 + CloudFront (with WAF) on one domain; API Gateway
+HTTP API + Lambda (Node.js, Arm); Cognito Essentials (Google, Apple, email one-time code,
+passkeys); Aurora PostgreSQL Serverless v2 with demographics in a separate schema and database
+roles that stop admins editing ratings; RSS ingestion through EventBridge Scheduler, Lambda and
+SQS with embedding-based event grouping; a separate admin app, API and staff user pool with
+required MFA and an append-only audit log. The API returns only two article shapes (sealed and
+revealed) chosen by a server-side `visibilityFor()`, with a contract test for leaks. Ratings carry
+`basis`, `opened_before_rating` and an optional prediction (PROP-0001).
+**Decision (if any):** None accepted; every ADR awaits M's and Daniel's approval. Recommended
+choices and alternatives are recorded in each ADR.
+**Files:** Created `docs/architecture/adr/0001-aws-as-cloud.md`, `0002-authentication-and-login.md`,
+`0003-account-integrity.md`, `0004-database.md`, `0005-api-layer.md`,
+`0006-frontend-hosting-and-api-migration.md`, `0007-headline-ingestion.md`,
+`0008-rating-flow-and-reading-at-source.md`, `0009-admin-interface.md`,
+`docs/architecture/admin-interface.md`, `docs/privacy/us-privacy-and-legal-requirements.md`.
+Modified `docs/architecture/README.md`, `docs/architecture/adr/README.md`,
+`docs/team/orders/ORD-0002-accounts-and-database-architecture.md`,
+`docs/team/orders/ORD-0003-admin-interface.md`, `docs/team/orders/README.md`,
+`docs/team/steve/memory.md`, `CLAUDE.md` (§4 tree only), `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only). Cost totals re-added by hand. AWS
+prices looked up on 2026-11-16: Cognito, API Gateway, CloudFront and WAF from AWS's pages; Lambda,
+Aurora and SES from dated third-party summaries because the official pages could not be fetched.
+RDS Proxy, ElastiCache, CloudWatch and other items are unpriced allowances.
+**Limitations, open issues and follow-up:** Cost figures are estimates based on assumed usage.
+Legal items need a lawyer (flagged in the checklist). Proposed next step: on approval, a build
+order for milestone M1 (login gate, estimated 1–2 weeks).
+
+---
+
 ## 2026-11-16: Record US focus, AWS and headlines-first decisions; issue ORD-0003 (admin interface)
 
 **Status:** Completed (documentation only)

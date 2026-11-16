@@ -1,6 +1,6 @@
 # ORD-0002: Architecture proposal for accounts, login, profiles and the database
 
-**Status:** Issued
+**Status:** Awaiting approval
 **Priority:** P1 (urgent)
 **Issued by:** Walter, agreed with M on 2026-11-16
 **Source decision:** `docs/team/walter/memory.md`, Decision register, 2026-11-16 ("Real users", "US focus", "AWS", "Headlines first")
@@ -44,9 +44,42 @@ rank and history saved on the server and available on any device.
 - **Open product question for M (design for both):** in v1, is the blind rating given on the **headline before** the reader opens the article (keeps "blind first"), or **after reading** at the source (the outlet is then known)? Walter recommends rating the headline blind first.
 - Login: email with passkeys or magic links, plus Google and Apple sign-in.
 
+## Further decisions by M (2026-11-16, relayed to Steve by the coordinator during the work)
+- **Q10 decided:** the blind rating (honest rating + prediction) is given on the **headline before
+  opening** the article; "Read at the source" comes after and reveals the outlet. Recorded in
+  ADR 0008.
+- **Q9 direction:** account creation must **not be hard for real people**, but must minimize the
+  risk of bots: a low-friction, layered approach. Recorded in ADR 0003.
+- **Login first:** the site goes behind a login as soon as possible (no Cloudflare Access
+  stopgap); the build plan starts with a login gate. Recorded in `docs/architecture/README.md`
+  (Phased build plan, M1).
+
 ## Steve's record
-- Started:
-- Branch / PR:
-- Development log entry:
-- Verification:
+- Started: 2026-11-16 (Steve). Proposal delivered 2026-11-16; status `Awaiting approval`.
+- Branch / PR: `order/0002-0003-architecture` (pushed; no pull request opened yet, at M's request,
+  so M and Daniel can review first).
+- Development log entry: "2026-11-16: Architecture proposal for accounts, database, headline
+  ingestion and admin (ORD-0002, ORD-0003)".
+- Deliverables:
+  - ADRs 0001–0009 in `docs/architecture/adr/` (all `Proposed`): AWS (0001), login (0002), account
+    integrity with options compared and a recommendation (0003), database (0004), API layer and
+    server-side rules incl. blind-first response shapes (0005), front-end hosting and move from
+    mocks (0006), headline ingestion and event grouping (0007), headline-first rating flow and
+    reading at the source (0008), admin approach and security (0009).
+  - `docs/architecture/README.md`: proposed target architecture, draft data model (ratings carry
+    a prediction and `opened_before_rating`), scale path at 1k/100k/1M MAU, monthly cost
+    estimates with assumptions and sources, phased build plan (M1 = login gate, 1–2 weeks).
+  - `docs/privacy/us-privacy-and-legal-requirements.md`: US privacy/legal checklist, items for a
+    lawyer flagged.
+- Verification: documentation only; no code changed, nothing built or provisioned. Prices looked
+  up on 2026-11-16 (sources listed in the README); the official Lambda and Aurora pages could not
+  be fetched, so dated third-party summaries were used. Some items are unpriced allowances.
 - Deviations and notes:
+  - Decisions needed from M and Daniel: approve each ADR; backend language (TypeScript
+    recommended, new to the project); the trust rule for counting ratings from flagged accounts
+    (ADR 0003); headline-score wording on Methods (ADR 0008); 18+ minimum age for the pilot;
+    whether deleted users' de-identified ratings stay in closed scores; DNS ownership for
+    vulgis.com.
+  - Questions for Walter: the daily article budget and selection rule (ADR 0007); no
+    platform-written event titles (ADR 0007).
+  - Cost finding: Cognito is the largest cost beyond the pilot (~70% at 1M MAU).

@@ -22,8 +22,8 @@ Each order is one file, `ORD-NNNN-short-title.md`, numbered in sequence and neve
 | Order | Title | Priority | Status | Issued | PR |
 |---|---|---|---|---|---|
 | [ORD-0001](ORD-0001-two-factor-crowd-alignment.md) | Two-factor Crowd Alignment (accuracy + ordering) | P1 | **On hold** (paused by M, 2026-11-16) | 2026-11-16 | |
-| [ORD-0002](ORD-0002-accounts-and-database-architecture.md) | Architecture proposal: accounts, login, profiles, database, headline ingestion on AWS (proposal only) | P1 | Issued | 2026-11-16 | |
-| [ORD-0003](ORD-0003-admin-interface.md) | Admin interface (design proposal, with ORD-0002) | P1 | Issued | 2026-11-16 | |
+| [ORD-0002](ORD-0002-accounts-and-database-architecture.md) | Architecture proposal: accounts, login, profiles, database, headline ingestion on AWS (proposal only) | P1 | **Awaiting approval** (proposal on branch `order/0002-0003-architecture`) | 2026-11-16 | not opened yet |
+| [ORD-0003](ORD-0003-admin-interface.md) | Admin interface (design proposal, with ORD-0002) | P1 | **Awaiting approval** (proposal on branch `order/0002-0003-architecture`) | 2026-11-16 | not opened yet |
 
 ## Template
 

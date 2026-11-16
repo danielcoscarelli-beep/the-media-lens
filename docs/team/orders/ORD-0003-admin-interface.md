@@ -1,6 +1,6 @@
 # ORD-0003: Admin interface (design proposal)
 
-**Status:** Issued
+**Status:** Awaiting approval
 **Priority:** P1 (urgent)
 **Issued by:** Walter, agreed with M on 2026-11-16
 **Source decision:** `docs/team/walter/memory.md`, Decision register, 2026-11-16 ("Admin interface")
@@ -37,8 +37,19 @@ settings, and see the key numbers, on desktop and on a phone.
   operations rather than curation.
 
 ## Steve's record
-- Started:
-- Branch / PR:
-- Development log entry:
-- Verification:
-- Deviations and notes:
+- Started: 2026-11-16 (Steve), together with ORD-0002. Status `Awaiting approval`.
+- Branch / PR: `order/0002-0003-architecture` (pushed; no pull request opened yet, at M's request).
+- Development log entry: "2026-11-16: Architecture proposal for accounts, database, headline
+  ingestion and admin (ORD-0002, ORD-0003)".
+- Deliverables: ADR 0009 (`docs/architecture/adr/0009-admin-interface.md`: separate admin app,
+  API and staff user pool with required MFA; roles Owner/Operator/Analyst with a permission
+  table; guardrails enforced by database permissions; tamper-evident audit log; versioned
+  settings published to Methods) and the screen list
+  `docs/architecture/admin-interface.md` (13 screens, plus what is deliberately absent).
+- Acceptance criteria covered: roles and access; content operations; user operations incl.
+  export/deletion; integrity monitoring; mission dashboard; settings; crowd-only guardrails;
+  screens and technical approach. Wireframes are written descriptions, not drawings.
+- Verification: documentation only; nothing built.
+- Deviations and notes: admins see community scores of open articles as counts only (to prevent
+  insider herding). Excluding suspended accounts' ratings is allowed only via the published rule
+  in ADR 0003, which needs M's and Daniel's decision. Admin v1 is milestone M4 in the build plan.
