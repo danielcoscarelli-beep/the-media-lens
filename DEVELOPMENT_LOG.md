@@ -28,6 +28,25 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Walter writes PROP-0001 (Insight rank) for approval
+
+**Status:** Completed (documentation only; the proposal is not approved or implemented)
+**Task / objective:** M asked Walter to write a proposal for M and Daniel to approve: replace Crowd
+Alignment with an Insight rank based on an honest rating plus a prediction, crowd only, with a
+separate Forecast badge.
+**Implementation:** Added the repository copy of the proposal and recorded M's decision and the
+proposal in Walter's memory. A working copy for comments was created as a claude.ai doc.
+**Technical explanation:** No code changed. The proposal specifies the scoring (Bayesian Truth Serum
+information score on a yes/no split at 50), the outputs, principle changes, risks and a rollout plan.
+**Files:** Created `docs/team/proposals/PROP-0001-insight-rank.md`. Modified
+`docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Worked-example arithmetic checked by hand. No simulation of the new method
+has been run yet; the proposal lists that as rollout step 2.
+**Limitations, open issues and follow-up:** Needs approval from both partners before any order is
+issued. `CLAUDE.md` is unchanged until then.
+
+---
+
 ## 2026-11-16: Record the two-question decision and prediction design notes
 
 **Status:** Completed (documentation only)

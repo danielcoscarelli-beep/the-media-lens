@@ -34,6 +34,7 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-16 | **Forecast is a separate badge, not part of the rank**; all four prediction countermeasures adopted (different format, asked second with rating locked, Forecast badge, "you expected / it was" reveal) | M | Fifth session of 2026-11-16. Written up as PROP-0001 for M's and Daniel's approval |
 | 2026-11-16 | **Two questions per article accepted:** an honest rating plus a prediction of how readers will rate | M | Fourth session of 2026-11-16; enables the "surprisingly popular" design (Q8) |
 | 2026-11-16 | **Crowd only.** Vulgis relies on the crowd alone: no platform-produced content (rules out calibration articles), no expert panels, no outside verdicts as the yardstick. Reason: any producer brings its own biases | M | Third session of 2026-11-16. Rules out Q8 options A, C and D |
 | 2026-11-16 | **ORD-0001 paused** (On hold) | M | The two-factor rank still measures anticipation of the crowd |
@@ -129,6 +130,13 @@ that genuinely promotes the Wisdom of the Crowd**.
 8. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
+## Proposals
+
+- PROP-0001 — Replace Crowd Alignment with an Insight rank (two questions, crowd only, Forecast
+  badge). Written 2026-11-16, awaiting M's and Daniel's approval. Repository copy:
+  `docs/team/proposals/PROP-0001-insight-rank.md`; working copy for comments: a claude.ai doc
+  shared by M. When approved: issue an order to Steve and cancel ORD-0001.
+
 ## Development orders issued
 
 - ORD-0001 — Two-factor Crowd Alignment (accuracy + ordering), P1, issued 2026-11-16, needs
@@ -151,3 +159,6 @@ that genuinely promotes the Wisdom of the Crowd**.
 - 2026-11-16 (later) — M accepted two questions per article and asked about projection. Walter
   explained that projection is built into the method and proposed four countermeasures (Q8 design
   notes). Open for M: whether accurate predictions earn a small part of the rank or a separate badge.
+- 2026-11-16 (later) — M chose a separate Forecast badge and all four countermeasures. Walter wrote
+  PROP-0001 for M's and Daniel's approval. Next: their approval; then the order to Steve. Suggested
+  next topic: crowd diversity and manipulation (Q5), now the decisive risk.
