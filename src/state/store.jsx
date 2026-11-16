@@ -13,7 +13,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { defaultUser } from '../data/user.js';
 import { getArticle } from '../data/articles.js';
-import { isValidPoints } from '../data/ratingScale.js';
+import { isValidPoints, MIN_POINTS } from '../data/ratingScale.js';
 import * as clock from '../lib/clock.js';
 import { boundaries } from '../lib/schedule.js';
 import { visibilityFor } from '../lib/visibility.js';
@@ -22,8 +22,11 @@ import { userAlignment } from '../lib/alignment.js';
 
 // v3 (2026-11-12): same shape as v2; bumped together with the clock key so ratings from the
 // previous timeline don't carry over to the new one.
+// 2026-11-15: ratings became any whole number 1–100 (slider). Saved ratings from the old five-option
+// scale (100/75/50/25/0) are still valid, except 0, which loads as 1 (the new lowest value).
+const migratePoints = (p) => (p === 0 ? MIN_POINTS : p);
 const KEY = 'media-lens:v3';
-const JOURNEY = { searched: false, rated: false, ratedThree: false, compared: false, sources: false, browsed: false, profileViewed: false };
+const JOURNEY = { searched: false, rated: false, ratedThree: false, compared: false, browsed: false, profileViewed: false };
 const fresh = () => ({ user: { ...defaultUser, joined: new Date(clock.now()).toISOString().slice(0, 10) }, ratings: [], browseSessions: [], journey: { ...JOURNEY } });
 
 function load() {
@@ -34,9 +37,9 @@ function load() {
     const base = fresh();
     return {
       user: { ...base.user, ...s.user, demographics: { ...base.user.demographics, ...(s.user?.demographics || {}) } },
-      ratings: Array.isArray(s.ratings) ? s.ratings.filter((r) => getArticle(r.articleId) && isValidPoints(r.points)) : [],
+      ratings: Array.isArray(s.ratings) ? s.ratings.map((r) => ({ ...r, points: migratePoints(r.points) })).filter((r) => getArticle(r.articleId) && isValidPoints(r.points)) : [],
       browseSessions: Array.isArray(s.browseSessions) ? s.browseSessions : [],
-      journey: { ...JOURNEY, ...s.journey },
+      journey: Object.fromEntries(Object.keys(JOURNEY).map((k) => [k, !!s.journey?.[k]])),
     };
   } catch { return fresh(); }
 }

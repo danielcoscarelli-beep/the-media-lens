@@ -28,6 +28,34 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-15: Slider rating (1–100), single colored scores, and removal of sourcing and framing analysis
+
+- **Date:** 2026-11-15
+- **Status:** Completed
+- **Task / objective:** Focus the product on rating and comparing articles. (1) Remove the sourcing feature. (2) Remove the framing analysis, which made the site look like it was giving its own opinion on an article’s bias. (3) Replace the five rating buttons with a 1–100 slider (100 = least biased) that starts with no value and has labeled marks: Nonbiased, Slightly biased, Biased, Very biased / Misleading, Nonfactual. (4) Show each article’s score as one average number with a color from pure gray (least biased) to pure red (most biased), with no distribution chart. (5) Remove “Readers divided”. All five are user decisions.
+- **Implementation:**
+  - Removed: the Source Explorer page and route, `SourceMap.jsx`, `SourceParts.jsx`, `data/sources.js`, `data/claims.js`, the article page’s Framing analysis / Sources / Facts & evidence tabs, Compare’s six-tab comparison panel and its per-column emphasis/framing/cited-sources sections, the article fields `emphasis, framing, charged, perspectives, omissions, opinionNote, sourceUses, claims, markers, intensity`, `MARKERS`, the events’ `comparison` and `date` fields, `[[highlight]]` headline markup, `shiftedSourceDate`, and the related Home, Methods, footer and mode-bar text.
+  - New scale (`data/ratingScale.js`): `SCALE_MARKS`, `isValidPoints` (whole numbers 1–100), `clampPoints`, `nearestMark`, `colorForScore` (linear blend `#808080` → `#ff0000`) and `toneStyle`.
+  - New components (`components/Rating.jsx`): `RatingSlider`, `ScoreBadge` (number + color swatch), `ScoreSwatch`, `YourRating`, `ScaleLegend`, `trackPct`. `DistributionBar` and `ScoreScale` are gone.
+  - Stats: `summarize()` now returns only `n, sum, mean`; distribution, entropy and “divided” were removed. Bias Ratings lost its “Most divided” sort.
+  - Simulated readers now give any whole number 1–100 instead of snapping to the five options.
+  - Store: saved ratings of 0 (the old Nonfactual) load as 1, and the obsolete `sources` journey flag is dropped on load. The storage key is unchanged, because the stored shape didn’t change.
+  - CSS: removed the `--r0…--r4` palette and rules for deleted features (193 lines, each checked against the code first); added `--score-best` / `--score-worst` tokens and slider styles, with marks staggered on two rows at phone width.
+- **Technical explanation:** A native `<input type="range">` (1–100) keeps keyboard and screen-reader support. Until the reader interacts, the component holds `null`: the thumb is hidden by CSS, the readout says “Move the slider…” and Submit stays disabled. Clicking the track, clicking a labeled mark, or pressing any arrow / Home / End key sets a value; an arrow press while unset sets 50, so keyboard users get a visible starting point by their own action. Score colors are computed per score in JS and passed as the `--rc` custom property, which badges, the reveal number, swatches, spread dots and “You:” chips already read.
+- **Decision:** No default slider value (user decision), to avoid anchoring ratings. Crowd Alignment math is unchanged: it already worked on numeric distances.
+- **Files:** Deleted `src/pages/SourceExplorer.jsx`, `src/components/SourceMap.jsx`, `src/components/SourceParts.jsx`, `src/data/sources.js`, `src/data/claims.js`. Modified `src/App.jsx`, `src/state/router.jsx`, `src/state/store.jsx`, `src/services/api.js`, `src/services/community.js`, `src/lib/schedule.js`, `src/lib/stats.js`, `src/lib/text.js`, `src/lib/visibility.js`, `src/data/ratingScale.js`, `src/data/articles.js`, `src/data/events.js`, `src/components/Rating.jsx`, `RatingPanel.jsx`, `Cards.jsx`, `Shell.jsx`, `Mode.jsx`, `ui.jsx`, `src/pages/Article.jsx`, `Compare.jsx`, `Home.jsx`, `BiasRatings.jsx`, `Profile.jsx`, `Methods.jsx`, `src/styles.css`, `tests/unit/rating-system.test.mjs`, `tests/e2e/rating-flow.e2e.cjs`, `CLAUDE.md`, `README.md`, `.claude/agents/media-lens-developer.md`, `DEVELOPMENT_LOG.md`.
+- **Testing and results:**
+  - The session couldn’t install npm packages, so the build used a stand-in: esbuild 0.28 with the machine’s React 19.2 (the project pins React 18.3.1 and Vite), followed by the project’s own `scripts/inline.mjs`. Before any change, the same stand-in build of `main` passed 81/82 E2E checks; the only failure was the Google Fonts request, which the sandbox blocks.
+  - `npm test`: 16/16 pass, including new tests for the scale, nearest mark, the gray-to-red color, and continuous simulated ratings.
+  - E2E (`tests/e2e/rating-flow.e2e.cjs`, rewritten for the slider): 103/104 pass. The one failure is again the blocked font request; a separate scan of every page found no other browser errors. New checks cover: slider 1–100 with five marks; no starting value; Submit disabled until set; five ways of setting a value (mark click, typing, arrow key while unset, mark then arrows, Nonfactual mark) giving 100, 83, 50, 37 and 1; the stored value; the shown score equalling the mean recomputed in Node with the app’s own modules on the page’s timeline; the score color matching `colorForScore`; no distribution chart; no analysis tabs; the Source Explorer page gone; the Compare page with no panel or sources. The leak scan still covers every page.
+  - The TypeScript checker found no undefined names, and its unused-import findings were fixed.
+  - Re-measured hedging on the new scale: always answering 75 now ranks at about the 24th percentile (it was about the 49th on the old scale), and always 85 at about the 44th. The Methods page and CLAUDE.md now use the 85 figure.
+  - Screenshots reviewed: sealed article (desktop), reveal, Compare, slider at 390 px (labels staggered, no horizontal overflow), and the Methods legend.
+- **Limitations, open issues and follow-up:**
+  - Not yet built with the project’s real toolchain (Vite + React 18.3.1). Run `npm install && npm test && npm run build:single && node tests/e2e/rating-flow.e2e.cjs` before publishing.
+  - Without a distribution, an average hides disagreement (disclosed on Methods).
+  - Simulated ratings above 100 are clamped, so about a fifth of simulated ratings are exactly 100.
+
 ## 2026-11-15: Temporary rename to Vulgis
 
 - **Date:** 2026-11-15

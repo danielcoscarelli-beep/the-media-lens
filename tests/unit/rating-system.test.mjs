@@ -7,7 +7,7 @@ import { __setClockForTests, HOUR, DAY, localDayKey } from '../../src/lib/clock.
 const EPOCH = new Date(2026, 10, 10, 9, 0, 0).getTime(); // Nov 10 2026, 09:00 local
 __setClockForTests({ epoch: EPOCH, offsetMs: 0 });
 
-const { RATING_OPTIONS, POINT_VALUES, nearestOption } = await import('../../src/data/ratingScale.js');
+const { SCALE_MARKS, isValidPoints, clampPoints, nearestMark, colorForScore } = await import('../../src/data/ratingScale.js');
 const { summarize, leaveOneOutMean } = await import('../../src/lib/stats.js');
 const { windowFor, statusAt, WINDOW_MS } = await import('../../src/lib/schedule.js');
 const { communityAt, finalOthers, simulatedRatings } = await import('../../src/services/community.js');
@@ -19,22 +19,32 @@ const { articles } = await import('../../src/data/articles.js');
 const byRef = (ref) => articles.find((a) => a.ref === ref);
 const rating = (articleId, points, ts) => ({ articleId, points, submittedAt: new Date(ts).toISOString() });
 
-test('five options with the required point values', () => {
-  assert.deepEqual(RATING_OPTIONS.map((o) => [o.label, o.points]), [
-    ['Neutral / Factual', 100], ['Slightly Biased', 75], ['Biased', 50], ['Very Biased / Misleading', 25], ['Nonfactual', 0]]);
-  assert.deepEqual(POINT_VALUES, [100, 75, 50, 25, 0]);
+test('slider scale: whole numbers 1–100 with five labeled marks', () => {
+  assert.deepEqual(SCALE_MARKS.map((m) => [m.label, m.points]), [
+    ['Nonbiased', 100], ['Slightly biased', 75], ['Biased', 50], ['Very biased / Misleading', 25], ['Nonfactual', 1]]);
+  for (const p of [1, 2, 37, 99, 100]) assert.ok(isValidPoints(p), `${p} valid`);
+  for (const p of [0, 101, 50.5, -3, '50', null]) assert.ok(!isValidPoints(p), `${p} invalid`);
+  assert.equal(clampPoints(-12), 1); assert.equal(clampPoints(140), 100); assert.equal(clampPoints(62.4), 62);
 });
 
-test('nearest category bands', () => {
-  const k = (s) => nearestOption(s).key;
-  assert.equal(k(100), 'neutral'); assert.equal(k(87.5), 'neutral'); assert.equal(k(87.4), 'slight');
-  assert.equal(k(62.5), 'slight'); assert.equal(k(62.4), 'biased'); assert.equal(k(37.5), 'biased');
-  assert.equal(k(12.5), 'very'); assert.equal(k(12.4), 'nonfactual'); assert.equal(k(0), 'nonfactual');
+test('nearest labeled mark', () => {
+  const k = (s) => nearestMark(s).label;
+  assert.equal(k(100), 'Nonbiased'); assert.equal(k(87.5), 'Nonbiased'); assert.equal(k(87.4), 'Slightly biased');
+  assert.equal(k(62.5), 'Slightly biased'); assert.equal(k(62.4), 'Biased'); assert.equal(k(37.5), 'Biased');
+  assert.equal(k(13), 'Very biased / Misleading'); assert.equal(k(12.9), 'Nonfactual'); assert.equal(k(1), 'Nonfactual');
+});
+
+test('score color runs from pure gray (100) to pure red (1)', () => {
+  assert.equal(colorForScore(100), 'rgb(128, 128, 128)');
+  assert.equal(colorForScore(1), 'rgb(255, 0, 0)');
+  assert.equal(colorForScore(150), 'rgb(128, 128, 128)'); assert.equal(colorForScore(-5), 'rgb(255, 0, 0)');
+  const mid = colorForScore(50.5).match(/\d+/g).map(Number);
+  assert.ok(mid[0] > 128 && mid[0] < 255 && mid[1] === mid[2] && mid[1] > 0 && mid[1] < 128, `mid ${mid}`);
 });
 
 test('community score is the arithmetic mean of point values', () => {
-  const s = summarize([100, 75, 50, 25, 0]);
-  assert.equal(s.mean, 50); assert.deepEqual(s.dist, [1, 1, 1, 1, 1]); assert.ok(Math.abs(s.entropy - 1) < 1e-9);
+  assert.equal(summarize([100, 75, 50, 25, 1]).mean, 50.2);
+  assert.equal(summarize([100, 92, 70, 50]).mean, 78);
   assert.equal(summarize([100, 100, 75, 50]).mean, 81.25);
   assert.equal(summarize([]).mean, null);
   assert.equal(leaveOneOutMean(250, 3, 100), 75);
@@ -143,9 +153,8 @@ test('cohort scores use leave-one-out averages', () => {
 test('rank status thresholds and a careful predictor outranks a contrarian', () => {
   const later = EPOCH + 10 * DAY;
   const eligible = articles.filter((a) => finalOthers(a.id).n >= A.MIN_CROWD);
-  const snapTo = (m) => POINT_VALUES.reduce((b, p) => (Math.abs(p - m) < Math.abs(b - m) ? p : b), 100);
-  const careful = eligible.map((a) => rating(a.id, snapTo(finalOthers(a.id).mean), EPOCH));
-  const contrarian = eligible.map((a) => rating(a.id, finalOthers(a.id).mean > 50 ? 0 : 100, EPOCH));
+  const careful = eligible.map((a) => rating(a.id, clampPoints(finalOthers(a.id).mean), EPOCH));
+  const contrarian = eligible.map((a) => rating(a.id, finalOthers(a.id).mean > 50 ? 1 : 100, EPOCH));
   assert.equal(A.userAlignment(careful.slice(0, 4), later).status, 'unranked');
   assert.equal(A.userAlignment(careful.slice(0, 5), later).status, 'provisional');
   assert.equal(A.userAlignment(careful.slice(0, 14), later).status, 'provisional');
@@ -157,4 +166,11 @@ test('rank status thresholds and a careful predictor outranks a contrarian', () 
   // A few lucky guesses are pulled toward the cohort average.
   const lucky = A.userAlignment(careful.slice(0, 5), later);
   assert.ok(lucky.adjustedError > lucky.rawError);
+});
+
+test('simulated readers use the whole 1–100 slider', () => {
+  const all = articles.flatMap((a) => simulatedRatings(a.id).map((r) => r.points));
+  assert.ok(all.every(isValidPoints), 'every simulated rating is a whole number 1–100');
+  const off = all.filter((p) => ![100, 75, 50, 25, 1].includes(p)).length;
+  assert.ok(off / all.length > 0.6, `most ratings fall between the marks (${off}/${all.length})`);
 });

@@ -1,11 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // THE single source of truth for what a reader may see about an article.
 // Every page and component must ask visibilityFor() instead of deciding locally,
-// so outlet, source and community information never leaks before a blind rating.
+// so outlet and community information never leaks before a blind rating.
 //
 //   sealed   → open article, Rating Mode, not yet rated by you. Only the headline,
-//              summary and article text may be shown. No outlet, byline, link,
-//              sources, editorial analysis or community data.
+//              summary and article text may be shown. No outlet, byline, link
+//              or community data.
 //   revealed → you rated it, OR its window closed, OR you are in Browse Mode,
 //              OR it was open during one of your Browse Mode sessions.
 //   canRate  → open, not rated, Rating Mode, and not seen in Browse Mode.

@@ -1,5 +1,4 @@
 import { publications } from '../data/publications.js';
-import { parseHeadline } from '../lib/text.js';
 import { useStore } from '../state/store.jsx';
 
 export function SampleTag({ children = 'Sample', title = 'Hypothetical sample content created for this prototype. Not real reporting.' }) {
@@ -21,12 +20,8 @@ export function PubName({ pub, withMark = true }) {
   );
 }
 
-export function Headline({ text, highlight = false, as: Tag = 'span', className = '' }) {
-  return (
-    <Tag className={className}>
-      {parseHeadline(text).map((p, i) => (p.hl && highlight ? <mark key={i} className="hl">{p.text}</mark> : <span key={i}>{p.text}</span>))}
-    </Tag>
-  );
+export function Headline({ text, as: Tag = 'span', className = '' }) {
+  return <Tag className={className}>{text}</Tag>;
 }
 
 export function LabelBadge({ label }) {

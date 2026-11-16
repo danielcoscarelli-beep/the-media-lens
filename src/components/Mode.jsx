@@ -24,7 +24,7 @@ export function ModeDialog({ onClose }) {
         <h2 id="mode-dialog-title" className="modal-title">Forfeit rating for the rest of today?</h2>
         <p className="small">Entering Browse Mode ends your rating for today.</p>
         <ul className="modal-list">
-          <li>You’ll see live community scores, publications and sources for every article.</li>
+          <li>You’ll see live community scores and publications for every article.</li>
           <li><strong>You won’t be able to submit any ratings until tomorrow</strong> (local midnight, in <Countdown until={nextLocalMidnight(now)} />).</li>
           {openUnrated > 0 && <li>You forfeit the {openUnrated} open article{openUnrated === 1 ? '' : 's'} you haven’t rated: {openUnrated === 1 ? 'it' : 'they'} can’t be rated later, even after Browse Mode ends, because you’ll have seen {openUnrated === 1 ? 'its' : 'their'} live results.</li>}
         </ul>
@@ -48,7 +48,7 @@ export function ModeBar() {
         <span className="mode-name"><span className="mode-dot" aria-hidden="true" />{mode === 'browse' ? 'Browse Mode' : 'Rating Mode'}</span>
         {mode === 'rating' ? (
           <>
-            <span className="mode-desc">Outlets, sources and community scores stay hidden until you rate each article.</span>
+            <span className="mode-desc">Outlets and community scores stay hidden until you rate each article.</span>
             <span className="mode-progress" aria-label={`${Math.min(ratedToday, MIN_DAILY_RATINGS)} of ${MIN_DAILY_RATINGS} ratings today`}>
               {Array.from({ length: MIN_DAILY_RATINGS }).map((_, i) => <span key={i} className={`mp-dot ${i < ratedToday ? 'on' : ''}`} />)}
               <span className="tabular">{ratedToday} rated today</span>
@@ -59,7 +59,7 @@ export function ModeBar() {
           </>
         ) : (
           <>
-            <span className="mode-desc">Live scores, publications and sources are visible. Rating is paused.</span>
+            <span className="mode-desc">Live scores and publications are visible. Rating is paused.</span>
             <span className="mode-progress"><Icon name="lock" size={12} /> Rating resumes in <Countdown until={nextLocalMidnight(now)} /></span>
           </>
         )}

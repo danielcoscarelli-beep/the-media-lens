@@ -4,6 +4,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const { chromium } = require('playwright');
 
 const ROOT = path.join(__dirname, '../../dist-single/index.html');
@@ -27,7 +28,7 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
 
   // Facts about the sample data, read from the running app's own modules is not possible from
   // outside, so the test uses the stable public ids from src/data/articles.js.
-  const AP = { id: 'kxfv', pub: 'Associated Press', author: 'Jordan Ellery', uniqueSource: 'Timelines Vary Widely', headline: 'Senate approves bill to speed permits' };
+  const AP = { id: 'kxfv', pub: 'Associated Press', author: 'Jordan Ellery', headline: 'Senate approves bill to speed permits' };
   const FOX = { id: 'h4mu', author: 'Brett Lancaster', headline: 'Senate Clears Bill to Slash Red Tape' };
   const GRID = { id: 'p527', author: 'Colby Rhodes', headline: 'Green Energy Failures Push Grid' }; // added 2026-11-12, open at start
   const TRANSIT = 'nf4s', AIHIRING = 'tz66'; // published at +20h and +34h
@@ -52,7 +53,7 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
       }
       const visible = [...document.body.querySelectorAll('*')].filter((e) => !exempt(e) && e.children.length === 0 && !['SCRIPT', 'STYLE'].includes(e.tagName)).map((e) => e.textContent).join('\n');
       const all = `${visible}\n${texts.join('\n')}\n${location.hash}`;
-      for (const s of [AP.pub, AP.author, AP.uniqueSource, FOX.author, GRID.author]) if (all.includes(s)) issues.push(`found "${s}"`);
+      for (const s of [AP.pub, AP.author, FOX.author, GRID.author]) if (all.includes(s)) issues.push(`found "${s}"`);
       for (const el of document.querySelectorAll(CARD_SELECTORS)) {
         const t = el.innerText || '';
         if (!(t.includes(AP.headline) || t.includes(FOX.headline) || t.includes(GRID.headline))) continue;
@@ -66,7 +67,7 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
     }, { AP, FOX, GRID, PUBS, CARD_SELECTORS });
     check(`no leak on ${label}`, found.length === 0, found.join('; '));
   };
-  for (const h of ['#home', '#explore', '#explore-permitting', '#explore-senate', '#explore-grid', '#compare', '#compare-permitting-act', '#compare-grid-heat', `#article-${AP.id}`, `#article-${FOX.id}`, `#article-${GRID.id}`, '#sources-permitting-act', '#sources-grid-heat', `#sources-${AP.id}`, '#profile', '#methods']) { await go(h); await scan(h); }
+  for (const h of ['#home', '#explore', '#explore-permitting', '#explore-senate', '#explore-grid', '#compare', '#compare-permitting-act', '#compare-grid-heat', `#article-${AP.id}`, `#article-${FOX.id}`, `#article-${GRID.id}`, '#profile', '#methods']) { await go(h); await scan(h); }
   await go(`#article-${TRANSIT}`);
   check('transit article not published at start', (await page.textContent('.page')).includes('Not published yet'));
   await go('#explore'); await page.click('text=By event'); await page.selectOption('#sort', 'publication'); await page.waitForTimeout(600); await scan('explore sorted by publication');
@@ -80,44 +81,68 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
   await go(`#article-${AP.id}`);
   await shot('02-article-sealed');
   check('sealed: article text visible', (await page.$$('.art-body p')).length >= 3);
-  check('sealed: five rating options', (await page.$$('.rate-opt')).length === 5);
+  check('sealed: rating slider 1–100', await page.$eval('.rpanel input[type=range]', (el) => el.min === '1' && el.max === '100').catch(() => false));
+  check('sealed: slider starts with no value', (await page.$$('.slider.is-unset')).length === 1 && (await page.textContent('.slider-readout')).includes('Move the slider'));
+  check('sealed: five labeled marks', (await page.$$eval('.rpanel .slider-mark', (els) => els.map((e) => e.textContent))).join('|') === '100Nonbiased|75Slightly biased|50Biased|25Very biased / Misleading|1Nonfactual');
   check('sealed: submit disabled until a choice', await page.isDisabled('button:has-text("Submit rating")'));
-  check('sealed: analysis tabs hidden', (await page.$$('#article-tabs-sources')).length === 0);
+  check('sealed: publication explained as hidden', (await page.textContent('.locked-analysis')).includes('revealed after you rate'));
+  check('sealed: no sourcing or analysis tabs', (await page.$$('#article-tabs-sources, #article-tabs-analysis, .tabs')).length === 0);
   check('sealed: no community score shown', (await page.$$('.score-badge')).length === 0);
   const cd1 = await page.textContent('.side-countdown'); await page.waitForTimeout(2100); const cd2 = await page.textContent('.side-countdown');
   check('countdown ticks', cd1 !== cd2, `${cd1} → ${cd2}`);
 
-  // ── Rate five open articles, one with each option ─────────────────────────
+  // ── Rate five open articles with the slider, using every input method ────
+  // The app's own modules recompute each community score in Node, on the page's timeline.
+  const clockState = await page.evaluate(() => JSON.parse(localStorage.getItem('media-lens:clock:v2')));
+  const mod = (f) => import(pathToFileURL(path.join(__dirname, '../../src', f)).href);
+  (await mod('lib/clock.js')).__setClockForTests(clockState);
+  const { communityAt } = await mod('services/community.js');
+  const { colorForScore } = await mod('data/ratingScale.js');
   const openIds = await page.evaluate(async () => [...document.querySelectorAll('.side-list a')].map((a) => a.getAttribute('href').replace('#article-', '')));
   const targets = [AP.id, ...openIds].slice(0, 5);
-  const labels = ['Neutral / Factual', 'Slightly Biased', 'Biased', 'Very Biased / Misleading', 'Nonfactual'];
-  const points = [100, 75, 50, 25, 0];
+  const setters = [
+    ['click the "Nonbiased" mark', 100, async () => page.click('.rpanel .slider-mark:has-text("Nonbiased")')],
+    ['type a value', 83, async () => page.fill('.rpanel input[type=range]', '83')],
+    ['press an arrow key while unset', 50, async () => { await page.focus('.rpanel input[type=range]'); await page.keyboard.press('ArrowRight'); }],
+    ['mark, then arrow keys', 37, async () => { await page.click('.rpanel .slider-mark:has-text("Very biased")'); await page.focus('.rpanel input[type=range]'); for (let k = 0; k < 12; k++) await page.keyboard.press('ArrowRight'); }],
+    ['click the "Nonfactual" mark', 1, async () => page.click('.rpanel .slider-mark:has-text("Nonfactual")')],
+  ];
   for (let i = 0; i < 5; i++) {
+    const [how, want, set] = setters[i];
     await go(`#article-${targets[i]}`);
-    await page.click(`.rate-opt:has(input[value="${points[i]}"])`);
+    await set();
+    check(`slider: ${how} → ${want}`, (await page.textContent('.slider-value')) === String(want) && !(await page.isDisabled('button:has-text("Submit rating")')), await page.textContent('.slider-readout'));
     await page.click('button:has-text("Submit rating")');
     await page.waitForSelector('.res-num');
     if (i === 0) { await page.waitForTimeout(500); await shot('03-reveal-midway'); }
     await page.waitForTimeout(3300);
     const panel = await page.textContent('.rpanel');
-    check(`option "${labels[i]}" locked in`, panel.includes(`Your rating: ${labels[i]}`));
+    check(`rating ${want} locked in`, panel.includes(`Your rating: ${want}/100`));
     check(`reveal ${i + 1}: includes your rating`, panel.includes('1 from you'));
-    const { pts, counts, shown, total } = await page.evaluate(() => ({
-      pts: [...document.querySelectorAll('.rpanel .dl-pts')].map((e) => +e.textContent),
-      counts: [...document.querySelectorAll('.rpanel .dl-n')].map((e) => +e.textContent.replace(/,/g, '')),
+    const saved = await page.evaluate((id) => JSON.parse(localStorage.getItem('media-lens:v3')).ratings.find((r) => r.articleId === id), targets[i]);
+    check(`reveal ${i + 1}: stored as ${want}`, saved && saved.points === want, JSON.stringify(saved));
+    const { shown, total, color } = await page.evaluate(() => ({
       shown: +document.querySelector('.res-num').textContent,
       total: +document.querySelector('.res-count strong').textContent.replace(/,/g, ''),
+      color: getComputedStyle(document.querySelector('.res-num')).getPropertyValue('--rc').trim(),
     }));
-    const n = counts.reduce((a, b) => a + b, 0); const mean = counts.reduce((a, c, k) => a + c * pts[k], 0) / n;
-    check(`reveal ${i + 1}: score = mean of points`, Math.round(mean) === shown && n === total, `computed ${mean.toFixed(2)}, shown ${shown}, n ${n}/${total}`);
+    const t0 = Date.parse(saved.submittedAt);
+    const options = [0, 2000, 5000].map((dt) => communityAt(targets[i], t0 + dt, saved));
+    const hit = options.find((c) => Math.round(c.mean) === shown && c.n === total);
+    check(`reveal ${i + 1}: score = mean of everyone's ratings`, !!hit, `shown ${shown} (n ${total}); recomputed ${options.map((c) => `${c.mean.toFixed(2)} (n ${c.n})`).join(', ')}`);
+    check(`reveal ${i + 1}: score color matches scale`, hit && color === colorForScore(hit.mean), `${color} vs ${hit && colorForScore(hit.mean)}`);
+    check(`reveal ${i + 1}: no distribution chart`, (await page.$$('.dist, .dist-bar, .dist-legend')).length === 0);
     const head = await page.textContent('.art-head');
     check(`reveal ${i + 1}: publication revealed`, PUBS.some((p) => head.includes(p)) && !head.includes('Publication hidden'));
-    check(`reveal ${i + 1}: sources tab unlocked`, (await page.$$('#article-tabs-sources')).length === 1);
+    check(`reveal ${i + 1}: compare link, no analysis tabs`, (await page.$$('.next-step a[href^="#compare-"]')).length === 1 && (await page.$$('.tabs')).length === 0);
     if (i === 0) await shot('04-revealed');
   }
   await go(`#article-${AP.id}`);
   check('AP article now shows its outlet', (await page.textContent('.art-head')).includes(AP.pub));
-  check('rating is final (no form on revisit)', (await page.$$('.rate-opt')).length === 0);
+  check('rating is final (no form on revisit)', (await page.$$('.rpanel input[type=range]')).length === 0);
+  await go('#sources'); check('Source Explorer page removed', !(await page.textContent('.main')).includes('Source Explorer') && !(await page.textContent('nav')).includes('Source'));
+  await go('#compare-permitting-act'); await shot('04b-compare');
+  check('compare: no comparison panel or cited sources', !(await page.textContent('.page')).match(/Comparison panel|Cited sources|Central emphasis/));
 
   // ── Browse Mode ──────────────────────────────────────────────────────────
   check('Browse Mode unlocked after 3 ratings', !(await page.isDisabled('.mode-btn')));
@@ -131,7 +156,7 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
   check('Browse Mode survives reload', (await page.textContent('.modebar')).includes('Browse Mode'));
   await go(`#article-${FOX.id}`);
   const foxRated = targets.includes(FOX.id);
-  check('Browse Mode: no rating form', (await page.$$('.rate-opt')).length === 0);
+  check('Browse Mode: no rating form', (await page.$$('.rpanel input[type=range]')).length === 0);
   check('Browse Mode: outlet and live score visible', (await page.textContent('.art-head')).includes('Fox News') && (await page.$$('.res-num')).length === 1, foxRated ? '(Fox was rated)' : '');
   await go('#ratings'); await page.click('.tab:has-text("Rate blind")'); await page.waitForTimeout(200);
   check('queue paused in Browse Mode', (await page.textContent('.tab-pane')).includes('Rating is paused'));
@@ -145,7 +170,7 @@ const check = (name, ok, detail = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}
   check('after 24h: AP article closed', (await page.textContent('.article-side')).includes('Closed'));
   check('after 24h: final score labeled', (await page.textContent('.rpanel')).includes('Final community score'));
   await go(`#article-${TRANSIT}`);
-  check('after 24h: transit article published and open', (await page.$$('.rate-opt')).length === 5);
+  check('after 24h: transit article published and open', (await page.$$('.rpanel input[type=range]')).length === 1);
   await go(`#article-${AIHIRING}`);
   check('after 24h: AI-hiring article still unpublished (opens at +34h)', (await page.textContent('.page')).includes('Not published yet'));
   await go(`#article-${AP.id}`);

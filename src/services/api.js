@@ -11,8 +11,6 @@
 import { articles, getArticle, articlesForEvent } from '../data/articles.js';
 import { events, getEvent } from '../data/events.js';
 import { publications } from '../data/publications.js';
-import { getSource } from '../data/sources.js';
-import { getClaim } from '../data/claims.js';
 import { isPublished, windowFor } from '../lib/schedule.js';
 
 const delay = (ms = 280) => new Promise((r) => setTimeout(r, ms));
@@ -24,7 +22,7 @@ function scoreArticle(a, tokens, sealed) {
   const ev = getEvent(a.eventId);
   const pub = publications[a.pub];
   const fields = [
-    [a.headline.replace(/\[|\]/g, ''), 5],
+    [a.headline, 5],
     [ev.title, 4],
     [[...ev.tags, ...ev.people, ...ev.orgs].join(' '), 3],
     [ev.topic, 3],
@@ -100,7 +98,5 @@ export async function getArticleBundle(id, { now }) {
     published: isPublished(article.id, now),
     event: getEvent(article.eventId),
     siblings: publishedFor(article.eventId, now).filter((a) => a.id !== id),
-    sources: article.sourceUses.map((u) => ({ ...getSource(u.id), use: u })),
-    claims: article.claims.map(getClaim).filter(Boolean),
   };
 }

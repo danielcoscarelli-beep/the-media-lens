@@ -1,28 +1,28 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Blind rating → reveal.
 //
-// Before submitting: five option cards and a Submit button. Nothing about the outlet,
-// sources or community result is rendered.
-// After submitting: the reveal sequence (see useReveal) shows the community score,
-// distribution, rating count and — via the parent page — the publication and sources.
+// Before submitting: a 1–100 slider (no starting value) and a Submit button. Nothing about
+// the outlet or community result is rendered.
+// After submitting: the reveal sequence (see useReveal) shows the community score, the
+// rating count and — via the parent page — the publication.
 // When the reader can't rate (closed, Browse Mode, already rated, seen in Browse Mode),
 // the panel shows the result view directly.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect, useRef, useState } from 'react';
-import { RATING_OPTIONS, nearestOption, optionForPoints } from '../data/ratingScale.js';
+import { nearestMark, toneStyle } from '../data/ratingScale.js';
 import { communityAt } from '../services/community.js';
 import { outcomeFor, MIN_CROWD } from '../lib/alignment.js';
 import { num } from '../lib/format.js';
 import { useStore } from '../state/store.jsx';
 import { Link } from '../state/router.jsx';
-import { DistributionBar, ScoreScale } from './Rating.jsx';
+import { RatingSlider } from './Rating.jsx';
 import { Countdown } from './Status.jsx';
 import { Headline, Icon } from './ui.jsx';
 
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Reveal stages: 1 rating locked · 2 score · 3 distribution & count · 4 publication · 5 sources & analysis.
+ * Reveal stages: 1 rating locked · 2 score · 3 rating count · 4 publication · 5 next steps.
  * stage === null means "not animating" (everything allowed to show).
  */
 export function useReveal() {
@@ -73,19 +73,9 @@ export default function RatingPanel({ article, v, reveal: external, showHeadline
             <div className="kicker">Blind rating</div>
             {showHeadline && <p className="rpanel-hl"><Headline text={article.headline} /></p>}
             <p className="rpanel-q">How would you rate this article?</p>
-            <p className="small muted">Judge the headline and text in front of you. The outlet, its sources and other readers’ ratings stay hidden until you submit.</p>
+            <p className="small muted">Judge the headline and text in front of you, from 1 (most biased) to 100 (least biased). The outlet and other readers’ ratings stay hidden until you submit.</p>
           </div>
-          <fieldset className="rate-opts">
-            <legend className="sr-only">Rating</legend>
-            {RATING_OPTIONS.map((o, i) => (
-              <label key={o.key} className={`rate-opt r${i} ${choice === o.points ? 'sel' : ''}`}>
-                <input type="radio" name={`rate-${article.id}`} value={o.points} checked={choice === o.points} onChange={() => setChoice(o.points)} />
-                <span className="ro-pts tabular">{o.points}<small> pts</small></span>
-                <span className="ro-label">{o.label}</span>
-                <span className="ro-help">{o.help}</span>
-              </label>
-            ))}
-          </fieldset>
+          <RatingSlider value={choice} onChange={setChoice} name={`rate-${article.id}`} />
           <div className="rpanel-actions">
             <span className="small muted"><Icon name="lock" size={12} /> Ratings are final once submitted. <span className="nowrap">Window closes in <Countdown until={v.closesAt} done="moments" />.</span></span>
             <button type="submit" className="btn btn-primary" disabled={choice === null}>Submit rating</button>
@@ -104,15 +94,13 @@ function Result({ article, v, now, stage }) {
   const c = communityAt(article.id, now, rating);
   const outcome = rating ? outcomeFor(rating, now) : null;
   const animating = stage !== null && stage < 5;
-  const mine = rating ? optionForPoints(rating.points) : null;
-  const closest = c.mean !== null ? nearestOption(c.mean) : null;
 
   return (
     <div className={`rpanel-body reveal ${animating ? 'is-revealing' : ''}`}>
       {rating && (
         <div className={`reveal-step lock ${shown(stage, 1) ? 'in' : ''}`}>
           <Icon name="check" size={15} />
-          <span>Your rating: <strong>{mine.label}</strong> <span className="tabular">({mine.points} pts)</span>. Locked in.</span>
+          <span>Your rating: <strong className="tabular">{rating.points}</strong>/100 <span className="muted">(closest mark: {nearestMark(rating.points).label})</span>. Locked in.</span>
         </div>
       )}
       {!rating && v.reason === 'closed' && <p className="reveal-note"><Icon name="lock" size={14} /> This article is closed to new ratings. The results below are final.</p>}
@@ -128,11 +116,11 @@ function Result({ article, v, now, stage }) {
         </div>
         {c.mean === null ? <p className="small muted">No ratings yet.</p> : (
           <div className="res-score">
-            <span className={`res-num tabular r${RATING_OPTIONS.indexOf(closest)}`}><CountUp to={c.mean} run={animating} /></span>
+            <span className="res-num tabular" style={toneStyle(c.mean)}><CountUp to={c.mean} run={animating} /></span>
             <span className="res-den">/100</span>
             <div className="res-meta">
-              <span>Closest category: <strong>{closest.label}</strong></span>
-              <span className="tiny muted">Average of submitted ratings. This is community perception, not a fact-check.</span>
+              <span>Average of all submitted ratings. 100 = least biased.</span>
+              <span className="tiny muted">The color runs from gray (least biased) to red (most biased). This is community perception, not a fact-check.</span>
             </div>
           </div>
         )}
@@ -143,10 +131,7 @@ function Result({ article, v, now, stage }) {
           <p className="small res-count">
             <strong className="tabular">{num(c.n)}</strong> ratings
             {' · '}<span className="muted">{num(c.simulatedN)} from simulated participants{c.includesYou ? ', 1 from you' : ''}</span>
-            {c.divided && <span className="divided-tag">Readers divided</span>}
           </p>
-          <DistributionBar dist={c.dist} highlightPoints={rating?.points ?? null} />
-          <ScoreScale score={c.mean} you={rating?.points ?? null} />
           {rating && outcome && (
             <p className="compare-note">
               {outcome.state === 'pending' && <>Your Crowd Alignment for this article is calculated when its window closes, comparing your rating with the final average of <em>everyone else’s</em> ratings.</>}
@@ -158,7 +143,7 @@ function Result({ article, v, now, stage }) {
       )}
       {stage !== null && (
         <p className={`reveal-step reveal-next small ${shown(stage, 5) ? 'in' : ''}`}>
-          <Icon name="arrow" size={13} /> The publication and its sources are now revealed. Compare how other outlets covered the same event, or trace where this article’s information came from.
+          <Icon name="arrow" size={13} /> The publication is now revealed. Compare how other outlets covered the same event.
         </p>
       )}
     </div>
