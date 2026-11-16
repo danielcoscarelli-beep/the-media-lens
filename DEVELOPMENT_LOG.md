@@ -28,6 +28,21 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Record M's decisions on rating timing, sign-up and the login gate
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record in Walter's memory M's decisions: rate the headline blind before
+opening (Q10); easy sign-up that minimizes bots (Q9); keep the demo public until Steve's login is
+built. Note the questions Steve's proposal raised for Walter (Q11).
+**Implementation:** Updated `docs/team/walter/memory.md`. `collab/main` fast-forwarded to
+`order/0002-0003-architecture` so the memory reflects Steve's proposal.
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** Steve's proposals await M's and Daniel's approval.
+
+---
+
 ## 2026-11-16: Architecture proposal for accounts, database, headline ingestion and admin (ORD-0002, ORD-0003)
 
 **Status:** Proposed (not implemented). Documentation only; no code changed, nothing built or provisioned.
