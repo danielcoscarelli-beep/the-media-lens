@@ -22,6 +22,7 @@ Each order is one file, `ORD-NNNN-short-title.md`, numbered in sequence and neve
 | Order | Title | Priority | Status | Issued | PR |
 |---|---|---|---|---|---|
 | [ORD-0001](ORD-0001-two-factor-crowd-alignment.md) | Two-factor Crowd Alignment (accuracy + ordering) | P1 | **On hold** (paused by M, 2026-11-16) | 2026-11-16 | |
+| [ORD-0002](ORD-0002-accounts-and-database-architecture.md) | Architecture proposal: accounts, login, profiles, database (proposal only) | P1 | Issued | 2026-11-16 | |
 
 ## Template
 

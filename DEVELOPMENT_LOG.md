@@ -28,6 +28,23 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Issue ORD-0002 (accounts and database architecture); record news-licensing research
+
+**Status:** Completed (documentation only)
+**Task / objective:** M asked to start the infrastructure for real users and to understand what
+Vulgis may use from news outlets.
+**Implementation:** Issued ORD-0002 (an architecture proposal for accounts, login, profiles and the
+database; nothing is built until M and Daniel approve). Recorded Walter's legal research summary
+(Q6), the account-integrity question (Q9) and the decisions in Walter's memory.
+**Technical explanation:** No code changed.
+**Files:** Created `docs/team/orders/ORD-0002-accounts-and-database-architecture.md`. Modified
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** The legal summary is research, not legal advice; a
+media/IP lawyer is needed before real articles are shown.
+
+---
+
 ## 2026-11-16: Walter writes PROP-0001 (Insight rank) for approval
 
 **Status:** Completed (documentation only; the proposal is not approved or implemented)

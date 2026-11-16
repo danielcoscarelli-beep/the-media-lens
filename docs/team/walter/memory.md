@@ -34,6 +34,8 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-16 | **Real users:** start the infrastructure for accounts, login, profiles and a database. ORD-0002 issued to Steve for an architecture proposal (ADRs) before anything is built | M | Sixth session of 2026-11-16 |
+| 2026-11-16 | **Real articles:** move from sample to real articles; legal approach being researched (Q6) | M | Sixth session of 2026-11-16 |
 | 2026-11-16 | **Forecast is a separate badge, not part of the rank**; all four prediction countermeasures adopted (different format, asked second with rating locked, Forecast badge, "you expected / it was" reveal) | M | Fifth session of 2026-11-16. Written up as PROP-0001 for M's and Daniel's approval |
 | 2026-11-16 | **Two questions per article accepted:** an honest rating plus a prediction of how readers will rate | M | Fourth session of 2026-11-16; enables the "surprisingly popular" design (Q8) |
 | 2026-11-16 | **Crowd only.** Vulgis relies on the crowd alone: no platform-produced content (rules out calibration articles), no expert panels, no outside verdicts as the yardstick. Reason: any producer brings its own biases | M | Third session of 2026-11-16. Rules out Q8 options A, C and D |
@@ -90,6 +92,25 @@ that genuinely promotes the Wisdom of the Crowd**.
    diverse (not one political side), and how to resist brigading, bots and multiple accounts?
 6. **Q6 — Content and licensing.** Showing real publications' articles needs a legal approach
    (licensing, excerpts and links, partnerships). Open in `CLAUDE.md` §9.
+   _2026-11-16 research (Walter, not legal advice; a media/IP lawyer is needed before launch):_
+   - Vulgis's core feature, full text shown **without the outlet**, is the riskiest use: it is a
+     full copy, and stripping author and title can be a separate US violation (DMCA §1202,
+     "copyright management information").
+   - US fair use is a case-by-case defense, not a permission. *AP v. Meltwater* (S.D.N.Y. 2013):
+     a commercial service excerpting headlines and ledes was not fair use.
+   - EU press publishers' right (DSM Directive Art. 15): only individual words and "very short
+     extracts" are free; some argue even long headlines can be covered.
+   - Brazil (Lei 9.610/98) has no general fair use; Art. 46 exceptions are narrow, and the STJ held
+     commercial news clipping falls outside them.
+   - Options: (1) **license full text** with terms that allow showing it without attribution until
+     the reader has rated (Guardian Open Platform free for non-commercial use; aggregators such as
+     Newstex, LexisNexis, NewsCatcher; direct deals); (2) **headline-only rating** (US: short
+     phrases are generally not copyrightable; EU less clear); (3) **publisher partnerships**;
+     (4) a browser-extension reader that masks branding on the publisher's own page (no copy by
+     Vulgis; blindness imperfect).
+   - **Immediate risk:** the public vulgis.com shows invented articles attributed to real outlets
+     (AP, Fox, CNN…). Labeled as sample, but Walter recommends switching to fictional outlet names
+     while the site is public. Raised with M 2026-11-16.
 7. **Q8 — How do we measure good judgment of neutrality and factuality without an answer key?**
    (Raised 2026-11-16 after M's position above.) Any score based on agreement with other raters
    rewards reading the crowd, whatever its formula. Options: (a) **calibration articles**: the
@@ -127,7 +148,10 @@ that genuinely promotes the Wisdom of the Crowd**.
    with a low weight or as a separate "Forecast" badge, which is M's call because it rewards
    anticipating the crowd, though separately from the honest rating; (4) after the window closes,
    show "you expected X%, it was Y%", which teaches readers how far their bubble extends.
-8. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
+8. **Q9 — Account integrity.** How hard should it be to create an account? Email only is easy to
+   fake at scale; phone, passkeys or stronger verification cost friction. Crowd-only makes this a
+   core business decision (link to Q5). Options to be compared in ORD-0002.
+9. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
 ## Proposals
@@ -162,3 +186,7 @@ that genuinely promotes the Wisdom of the Crowd**.
 - 2026-11-16 (later) — M chose a separate Forecast badge and all four countermeasures. Walter wrote
   PROP-0001 for M's and Daniel's approval. Next: their approval; then the order to Steve. Suggested
   next topic: crowd diversity and manipulation (Q5), now the decisive risk.
+- 2026-11-16 (later) — M sent PROP-0001 to Daniel. M opened two workstreams: real users (ORD-0002
+  issued for an architecture proposal) and real articles (Q6 legal research summarized; lawyer
+  needed; fictional outlet names recommended for the public demo). Open for M: Q9 account
+  integrity, where the company and first users are, licensing vs. headline-only.
