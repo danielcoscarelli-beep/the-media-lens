@@ -3,7 +3,7 @@
 Business strategy memory for Vulgis. Read in full at the start of every session; update at the end.
 Never delete history: mark superseded entries and add new ones.
 
-_Last updated: 2026-11-16 (first strategy session: herding and the two-factor ranking)._
+_Last updated: 2026-11-16 (sessions on herding and on what the rank should measure)._
 
 ## Mission (from M, 2026-11-16)
 
@@ -34,6 +34,7 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-16 | **M's position on the rank's purpose:** the rank should recognize readers who judge an article's neutrality and factuality well, not readers who anticipate the crowd. The crowd's job is to find such articles. This reverses Daniel's 2026-11-12 decision (`CLAUDE.md` §1.4) | M (not yet agreed with Daniel) | M, second session of 2026-11-16. Walter recommends calibration articles as the measure (see Q8) and pausing ORD-0001 |
 | 2026-11-16 | **Two-factor Crowd Alignment**: rank = accuracy (closeness to the crowd's final average) + ordering (same order as the crowd), standardized and combined. Issued as ORD-0001 | M (Daniel's approval pending; memo sent 2026-11-15) | Removes the reward for constant answers. Walter's caveat: it fixes hedging but **not** herding (see Q2) |
 
 ## Assumptions register
@@ -85,7 +86,20 @@ that genuinely promotes the Wisdom of the Crowd**.
    diverse (not one political side), and how to resist brigading, bots and multiple accounts?
 6. **Q6 — Content and licensing.** Showing real publications' articles needs a legal approach
    (licensing, excerpts and links, partnerships). Open in `CLAUDE.md` §9.
-7. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
+7. **Q8 — How do we measure good judgment of neutrality and factuality without an answer key?**
+   (Raised 2026-11-16 after M's position above.) Any score based on agreement with other raters
+   rewards reading the crowd, whatever its formula. Options: (a) **calibration articles**: the
+   platform writes paired versions of a story, one neutral and accurate, one with deliberate
+   slant or factual errors, mixed into the feed and revealed afterwards; known answers by
+   construction, and the reveal teaches; (b) **peer-prediction mechanisms** (Bayesian Truth Serum,
+   Prelec 2004) that make honest reporting the best strategy, but need a second question and are
+   hard to explain; (c) **later external evidence** (corrections, retractions, independent
+   fact-checks), slow and partial; (d) **expert panel**, which conflicts with the crowd mission.
+   **Walter's recommendation:** (a) as the core of the reader rank, with community scores built
+   from unscored honest ratings, and later skill-weighted community scores. Tension: calibration
+   items are platform-authored, so they must be clearly disclosed and never applied to real
+   outlets' articles (`CLAUDE.md` §1.2). Needs Daniel.
+8. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
 ## Development orders issued
@@ -100,3 +114,7 @@ that genuinely promotes the Wisdom of the Crowd**.
 - 2026-11-16 — First session with M, on herding. M decided to implement the two-factor rank;
   ORD-0001 issued. Walter argued it fixes hedging but not herding (A6) and recommended a phase-2
   "predict the crowd" question (Q2). Next: M's view on phase 2; Daniel's response to the memo.
+- 2026-11-16 (later) — M rejected ranking by anticipation of the crowd: the rank should reward good
+  judgment of neutrality and factuality. Walter opened Q8 (measuring judgment without an answer
+  key), recommended calibration articles, and recommended pausing ORD-0001 pending M's and
+  Daniel's decision. Awaiting M's answer on pausing and on a proposal for Daniel.

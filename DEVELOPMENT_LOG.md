@@ -28,6 +28,23 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Walter session on what the reader rank should measure
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's position that the rank should reward good judgment of an article's
+neutrality and factuality, not anticipation of the crowd, and Walter's analysis of how to measure it.
+**Implementation:** Updated `docs/team/walter/memory.md`: decision register (M's position, not yet
+agreed with Daniel), new open question Q8 with options and a recommendation (calibration articles),
+session log.
+**Technical explanation:** No code changed. ORD-0001 is unchanged; Walter recommends pausing it
+pending M's answer.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** M's position reverses Daniel's 2026-11-12 decision
+(`CLAUDE.md` §1.4), so `CLAUDE.md` is not changed until both partners agree.
+
+---
+
 ## 2026-11-16: Walter session on herding; issue ORD-0001 (two-factor Crowd Alignment)
 
 **Status:** Completed (documentation only; the order itself is not implemented yet)
