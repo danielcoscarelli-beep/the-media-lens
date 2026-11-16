@@ -34,6 +34,10 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-16 | **US focus:** Vulgis targets the US market and US news for now | M | Seventh session of 2026-11-16 |
+| 2026-11-16 | **AWS** is the cloud | M | Seventh session of 2026-11-16 |
+| 2026-11-16 | **Headlines first (v1):** show headlines with a link to read the article at the source (pop-up or window); no article text stored or shown; the outlet stays hidden until the reader opens the article. Licensing later, if Vulgis grows | M | Lower legal risk (Q6) |
+| 2026-11-16 | **Admin interface** to be designed and built. ORD-0003 issued (design proposal, with ORD-0002) | M | Seventh session of 2026-11-16 |
 | 2026-11-16 | **Real users:** start the infrastructure for accounts, login, profiles and a database. ORD-0002 issued to Steve for an architecture proposal (ADRs) before anything is built | M | Sixth session of 2026-11-16 |
 | 2026-11-16 | **Real articles:** move from sample to real articles; legal approach being researched (Q6) | M | Sixth session of 2026-11-16 |
 | 2026-11-16 | **Forecast is a separate badge, not part of the rank**; all four prediction countermeasures adopted (different format, asked second with rating locked, Forecast badge, "you expected / it was" reveal) | M | Fifth session of 2026-11-16. Written up as PROP-0001 for M's and Daniel's approval |
@@ -148,10 +152,16 @@ that genuinely promotes the Wisdom of the Crowd**.
    with a low weight or as a separate "Forecast" badge, which is M's call because it rewards
    anticipating the crowd, though separately from the honest rating; (4) after the window closes,
    show "you expected X%, it was Y%", which teaches readers how far their bubble extends.
-8. **Q9 — Account integrity.** How hard should it be to create an account? Email only is easy to
+8. **Q10 — Is the v1 rating given on the headline before opening, or after reading at the source?**
+   Rating after reading means the outlet is known, which weakens "blind first" (`CLAUDE.md` §1.5).
+   Walter recommends rating the headline blind first, then "Read at the source". Asked M
+   2026-11-16; ORD-0002 designs for both.
+   Also: selecting which headlines appear is an editorial act; prefer transparent, rule-based
+   selection from a published, balanced list of US outlets (ORD-0003).
+9. **Q9 — Account integrity.** How hard should it be to create an account? Email only is easy to
    fake at scale; phone, passkeys or stronger verification cost friction. Crowd-only makes this a
    core business decision (link to Q5). Options to be compared in ORD-0002.
-9. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
+10. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
 ## Proposals
@@ -190,3 +200,7 @@ that genuinely promotes the Wisdom of the Crowd**.
   issued for an architecture proposal) and real articles (Q6 legal research summarized; lawyer
   needed; fictional outlet names recommended for the public demo). Open for M: Q9 account
   integrity, where the company and first users are, licensing vs. headline-only.
+- 2026-11-16 (later) — M set US focus, AWS, headlines-first v1 and an admin interface. ORD-0002
+  updated, ORD-0003 issued, Steve started on both (proposals only). Open for M: Q10 (rate the
+  headline before or after reading), Q9 account integrity, fictional outlet names on the public
+  demo. Q6 jurisdiction answered: US.

@@ -3,7 +3,8 @@
 **Status:** Issued
 **Priority:** P1 (urgent)
 **Issued by:** Walter, agreed with M on 2026-11-16
-**Source decision:** `docs/team/walter/memory.md`, Decision register, 2026-11-16 ("Real users")
+**Source decision:** `docs/team/walter/memory.md`, Decision register, 2026-11-16 ("Real users", "US focus", "AWS", "Headlines first")
+**Updated:** 2026-11-16, after M's decisions: US market and US news only; AWS is the cloud; v1 shows headlines with a link to read at the source. Scope widened accordingly (see "Decisions already made").
 **Needs Daniel's approval:** Yes, before anything is built: a backend, database and authentication are architectural changes (`CLAUDE.md` §7.4). **This order is for the proposal only.** Building comes in a later order once M and Daniel approve.
 
 ## Business objective
@@ -15,14 +16,21 @@ accounts that are cheap to create for real people and expensive to fake at scale
 Readers can register, log in (desktop and mobile), keep a profile, and have their ratings, Insight
 rank and history saved on the server and available on any device.
 
+## Decisions already made (2026-11-16, M)
+- **Market:** the US, US news only, for now.
+- **Cloud:** **AWS.** No AWS-vs-Azure comparison needed; choose AWS services and note anything that would be hard to move later.
+- **Content in v1:** **headlines only, plus a link to read the article at the source** (a pop-up or new window). Vulgis stores and shows the headline and the URL, never the article text. The outlet stays hidden until the reader opens the article. Full-text licensing comes later.
+- **Admin interface:** needed; its design is ORD-0003, to be proposed together with this order.
+
 ## Acceptance criteria (for the proposal)
-- [ ] A set of ADRs in `docs/architecture/adr/` covering at least: cloud provider (AWS vs. Azure) for this phase; authentication service and login methods; database; API layer; how the front end moves from `services/` mocks to the API; hosting of the front end (stay on Cloudflare Pages or move).
+- [ ] A set of ADRs in `docs/architecture/adr/` covering at least: AWS as the cloud (record M's decision); authentication service and login methods; database; API layer; how the front end moves from `services/` mocks to the API; hosting of the front end (stay on Cloudflare Pages or move to AWS); **headline ingestion** (how US headlines and URLs are collected, e.g. publishers' RSS feeds or a headlines API, and grouped by event, without copying article text).
 - [ ] **Account integrity options** compared (email only, email + phone, passkeys, social login, stronger verification), with cost, friction and how well each resists duplicate and fake accounts. This is a business decision for M; give a recommendation.
 - [ ] **Server-side rules:** rating windows and daily limits enforced by the server clock; the API never returns an article's outlet, byline or community score to a reader who hasn't rated it (blind first, `CLAUDE.md` §1.5).
-- [ ] **Data model** draft: users, profiles (demographics optional, private, stored separately and never used in ranking, `CLAUDE.md` §1.6), articles, ratings. Ratings must allow both an honest rating and a prediction (PROP-0001, pending approval).
-- [ ] **Privacy and legal requirements** listed: LGPD (Brazil), GDPR (EU) and US state privacy laws as they apply to where users will be; minimum age; consent; data export and deletion. Flag anything needing a lawyer.
+- [ ] **Data model** draft: users, profiles (demographics optional, private, stored separately and never used in ranking, `CLAUDE.md` §1.6), outlets, events, articles (headline, URL, outlet, publication time; **no body text**), ratings, admin users and an audit log. Ratings must allow both an honest rating and a prediction (PROP-0001, pending approval). Record whether the reader opened the article before rating.
+- [ ] **Reading at the source:** how the link opens (pop-up, new tab, or an in-app window), noting that many news sites forbid being shown inside another site's frame; how the outlet stays hidden until the reader opens it.
+- [ ] **Privacy and legal requirements** for a US service: US state privacy laws (e.g. California's CCPA/CPRA), COPPA (children under 13) and the minimum age, consent, data export and deletion. Flag anything needing a lawyer.
 - [ ] **Scale path:** what the design costs and handles at 1,000, 100,000 and 1,000,000+ users, and what changes between those stages.
-- [ ] **Monthly cost estimates** at those stages, and portability between AWS and Azure noted.
+- [ ] **Monthly AWS cost estimates** at those stages.
 - [ ] Architecture overview (`docs/architecture/README.md`) updated with the proposed target state, clearly marked as proposed.
 
 ## Constraints
@@ -32,7 +40,8 @@ rank and history saved on the server and available on any device.
 - Don't build or provision anything yet.
 
 ## Options discussed
-- Go straight to the eventual cloud (AWS or Azure) vs. a fast pilot on a portable managed Postgres + auth service and migrate later. Walter leans toward choosing the cloud now to avoid a second migration, unless the pilot path is much faster or cheaper.
+- Cloud: decided, AWS (2026-11-16).
+- **Open product question for M (design for both):** in v1, is the blind rating given on the **headline before** the reader opens the article (keeps "blind first"), or **after reading** at the source (the outlet is then known)? Walter recommends rating the headline blind first.
 - Login: email with passkeys or magic links, plus Google and Apple sign-in.
 
 ## Steve's record

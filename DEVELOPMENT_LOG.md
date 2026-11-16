@@ -28,6 +28,23 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Record US focus, AWS and headlines-first decisions; issue ORD-0003 (admin interface)
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's decisions (US market and news, AWS, v1 with headlines plus a link
+to the source, an admin interface) and hand them to Steve.
+**Implementation:** Updated ORD-0002's scope, issued ORD-0003 (admin interface design proposal),
+updated the order index and Walter's memory.
+**Technical explanation:** No code changed.
+**Files:** Created `docs/team/orders/ORD-0003-admin-interface.md`. Modified
+`docs/team/orders/ORD-0002-accounts-and-database-architecture.md`, `docs/team/orders/README.md`,
+`docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** These decisions are M's; `CLAUDE.md` is unchanged until
+Daniel agrees. Open question Q10 (rate the headline before or after reading at the source).
+
+---
+
 ## 2026-11-16: Issue ORD-0002 (accounts and database architecture); record news-licensing research
 
 **Status:** Completed (documentation only)
