@@ -170,7 +170,17 @@ that genuinely promotes the Wisdom of the Crowd**.
     rating per day (a cap keeps ratings per article high enough to be significant), and whether
     events carry no platform-written titles (crowd-only). Also: the community score now describes
     the headline, not the full article; the Methods wording must say so (needs Daniel).
-11. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
+11. **Q12 — Working prototype before the full AWS build?** (M, 2026-11-16 evening.) Walter's
+    recommendation: yes. Build a small working prototype on a backend-as-a-service (Supabase:
+    PostgreSQL + auth; hosted on the existing Cloudflare Pages), using the same data model as ADR
+    0004 so a later move to AWS is mostly a database copy. Invite-only, behind login. Purpose:
+    validate engagement and the two-question rating with real people before spending on AWS. M also
+    asked why Steve's timeframes (1–2 weeks for M1, 3–4 weeks per later milestone) are so long.
+    Walter's view: they read as conventional team estimates. With agents writing code, coding is
+    days; the real bottlenecks are approvals, accounts and keys only M can create, a lawyer's review
+    before going public, and this workspace's package-install restrictions. Awaiting M's go-ahead
+    for an order.
+12. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
 ## Proposals
@@ -216,3 +226,6 @@ that genuinely promotes the Wisdom of the Crowd**.
 - 2026-11-16 (later) — M decided Q10 (rate before opening), Q9 (easy but bot-resistant) and to keep
   the demo public until Steve's login (no stopgap). Steve delivered the ORD-0002/0003 proposals
   (9 ADRs, phased plan with the login gate as M1, cost estimates). Awaiting M's and Daniel's review.
+- 2026-11-16 (evening) — M asked for a working prototype before committing to a full AWS build and
+  questioned the timeframes. Walter recommended a Supabase-based prototype (Q12) and explained the
+  real bottlenecks. Awaiting M's go-ahead.

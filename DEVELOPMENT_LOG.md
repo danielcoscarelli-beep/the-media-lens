@@ -28,6 +28,19 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-16: Walter records the prototype-first question (Q12)
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's request for a working prototype before a full AWS build, and
+Walter's recommendation.
+**Implementation:** Updated `docs/team/walter/memory.md` (Q12, session log).
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** No order issued yet; awaiting M's go-ahead.
+
+---
+
 ## 2026-11-16: Record M's decisions on rating timing, sign-up and the login gate
 
 **Status:** Completed (documentation only)
