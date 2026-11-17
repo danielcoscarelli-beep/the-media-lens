@@ -34,6 +34,7 @@ that genuinely promotes the Wisdom of the Crowd**.
 | 2026-11-15 | Product renamed Vulgis (temporary); slider replaces 5 options; framing and sourcing features removed | Daniel | `DEVELOPMENT_LOG.md` |
 | 2026-11-15 | vulgis.com hosted on Cloudflare Pages from M's fork | M | Deployment session |
 | 2026-11-16 | Walter (strategy) and Steve (development) agents created; Walter issues development orders to Steve | M | This file's creation |
+| 2026-11-17 | **Prototype first (Q12):** build a small, invite-only working prototype on Supabase + Cloudflare Pages before the full AWS build. ORD-0004 issued | M | Session of 2026-11-17 |
 | 2026-11-16 | **Q10 decided: rate the headline blind before opening** (honest rating + prediction); "Read at the source" afterwards reveals the outlet | M | Eighth session of 2026-11-16 |
 | 2026-11-16 | **Q9 decided: sign-up must be easy for people but minimize bots** (layered protection, step-up checks only when suspicious) | M | Eighth session of 2026-11-16 |
 | 2026-11-16 | **Public demo keeps real outlet names; the site goes behind a login as soon as possible**, via Steve's design (no Cloudflare Access stopgap) | M | Eighth session of 2026-11-16 |
@@ -180,7 +181,16 @@ that genuinely promotes the Wisdom of the Crowd**.
     days; the real bottlenecks are approvals, accounts and keys only M can create, a lawyer's review
     before going public, and this workspace's package-install restrictions. Awaiting M's go-ahead
     for an order.
-12. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
+    _2026-11-17: Decided by M; ORD-0004 issued._ Blocker found: this workspace cannot reach the
+    npm registry, so nothing can be built or tested here until M allows package installs.
+12. **Q13 — Competitor reference: Ground News** (researched 2026-11-17). Shows headlines and its
+    own AI-written summaries, links out to the original articles, and labels **outlets** (not
+    articles) with bias and factuality ratings taken from third parties (AllSides, Ad Fontes,
+    Media Bias/Fact Check). It does not host full articles. It does not disclose its publisher
+    arrangements. Lessons for Vulgis: headline + link-out is a proven model; its AI summaries are
+    platform-authored text, which Vulgis's crowd-only and no-platform-opinion principles rule out;
+    Vulgis's differentiators are blind rating of individual articles and crowd-only judgment.
+13. **Q7 — Who is the customer?** Readers, schools and media-literacy programs, newsrooms,
    researchers, platforms? This drives both the business model and the incentive design.
 
 ## Proposals
@@ -229,3 +239,6 @@ that genuinely promotes the Wisdom of the Crowd**.
 - 2026-11-16 (evening) — M asked for a working prototype before committing to a full AWS build and
   questioned the timeframes. Walter recommended a Supabase-based prototype (Q12) and explained the
   real bottlenecks. Awaiting M's go-ahead.
+- 2026-11-17 — M approved the prototype; ORD-0004 issued and Steve started on P0 (setup
+  checklist). Package installs are blocked in this workspace (flagged). M asked how Ground News
+  sources articles; research recorded as Q13.

@@ -28,6 +28,23 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-17: Issue ORD-0004 (working prototype on Supabase); record Ground News research
+
+**Status:** Completed (documentation only)
+**Task / objective:** M approved building a small working prototype before the full AWS build.
+**Implementation:** Created ORD-0004 with milestones P0–P3 (setup checklist, login gate, accounts
+and two-question ratings, real US headlines); updated the order index and Walter's memory (decision,
+Q12 resolved, Q13 competitor note on Ground News).
+**Technical explanation:** No code changed.
+**Files:** Created `docs/team/orders/ORD-0004-supabase-working-prototype.md`. Modified
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only). Checked that this workspace cannot
+reach the npm registry (`npm view` fails), which blocks building and testing.
+**Limitations, open issues and follow-up:** Package installs must be allowed before Steve can build
+and verify the prototype here.
+
+---
+
 ## 2026-11-16: Walter records the prototype-first question (Q12)
 
 **Status:** Completed (documentation only)
