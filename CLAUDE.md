@@ -91,7 +91,8 @@ the-media-lens/
 ├── docs/
 │   ├── team/               Walter and Steve: team README, permanent memory files, development orders
 │   ├── architecture/       Architecture overview, ADRs (Architecture Decision Records), admin screen list
-│   └── privacy/            US privacy and legal requirements checklist (proposed, 2026-11-16)
+│   ├── privacy/            US privacy and legal requirements checklist (proposed, 2026-11-16)
+│   └── setup/              Plain-language setup checklists for M (Supabase prototype, ORD-0004 P0, 2026-11-17)
 └── src/
     ├── main.jsx            Mounts <App/>, imports styles.css
     ├── App.jsx             Providers + shell (NavBar, ModeBar, SampleBanner) + page switch

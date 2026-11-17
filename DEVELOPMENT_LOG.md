@@ -28,6 +28,40 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-17: ORD-0004 P0, Supabase prototype setup checklist for M
+
+**Status:** Completed (documentation only)
+**Task / objective:** Milestone P0 of ORD-0004: a plain-language checklist M can follow in about 30
+minutes to create the Supabase project, Google sign-in, the settings Steve needs, and to allow
+package installs in the Claude workspace, before any prototype code is written.
+**Implementation:** Wrote `docs/setup/prototype-supabase-setup.md` (Parts A–I: Supabase account and
+US project; Google Auth Platform client and Supabase Google provider; email code template;
+Site URL and redirect URLs for vulgis.com, the pages.dev address, branch previews and localhost;
+sign-ups switched off until the invite list exists; how testers will be invited; Cloudflare Pages
+preview addresses and Preview-only variables `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`; which
+values to send Steve and which secrets never leave Supabase/Google/M's password manager; Claude
+network access). Each step was checked against current official documentation (sources listed in
+the file), with unverified screen labels marked. Updated ORD-0004's record and status, the order
+index, `CLAUDE.md` §4 (new `docs/setup/` folder) and Steve's memory.
+**Technical explanation:** No code changed.
+**Decision (if any):** Planned for P1 and recorded in the order: `VITE_SUPABASE_ANON_KEY` holds the
+new **publishable** key, because Supabase deprecates the legacy anon key by the end of 2026;
+invite-only via an `invited_emails` table and a "Before User Created" auth hook (fallback: sign-ups
+off, accounts created in advance); testers use Google sign-in because Supabase's built-in email
+reaches only project team members (2 emails/hour) until a custom SMTP provider is approved.
+**Files:** Created `docs/setup/prototype-supabase-setup.md`. Modified
+`docs/team/orders/ORD-0004-supabase-working-prototype.md`, `docs/team/orders/README.md`,
+`docs/team/steve/memory.md`, `CLAUDE.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only). Re-checked the environment blocker:
+`npm view react version` fails with ENOTFOUND for `registry.npmjs.org`, and a request through the
+session proxy is refused (CONNECT 403).
+**Limitations, open issues and follow-up:** Screen labels in Supabase, Google Cloud, Cloudflare and
+Claude settings were taken from documentation, not seen (listed at the end of the checklist).
+Free-plan availability of the "Before User Created" hook is unverified. P1 cannot be built or
+verified until M enables package installs and continues in a new chat.
+
+---
+
 ## 2026-11-17: Issue ORD-0004 (working prototype on Supabase); record Ground News research
 
 **Status:** Completed (documentation only)

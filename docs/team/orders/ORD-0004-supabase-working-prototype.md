@@ -1,6 +1,6 @@
 # ORD-0004: Working prototype on Supabase (before the full AWS build)
 
-**Status:** Issued
+**Status:** In progress (P0 done)
 **Priority:** P1 (urgent)
 **Issued by:** Walter, agreed with M on 2026-11-17
 **Source decision:** `docs/team/walter/memory.md`, Decision register, 2026-11-17 ("Prototype first", Q12)
@@ -33,7 +33,7 @@ other testers. Nobody without an invitation can see the site.
    scheduled ingestion. Do not invite anyone outside the team until a lawyer has reviewed (Q6).
 
 ## Acceptance criteria
-- [ ] P0 checklist delivered to M before code starts.
+- [x] P0 checklist delivered to M before code starts (`docs/setup/prototype-supabase-setup.md`, 2026-11-17).
 - [ ] The data model follows ADR 0004 (as a subset) so a later move to AWS is mostly a database copy. Record the mapping and any differences in a new ADR ("Prototype on Supabase").
 - [ ] Uninvited visitors and signed-out visitors see only a sign-in page; this covers the preview address too.
 - [ ] Blind first holds at the API level: an automated test shows the outlet, link and score are not returned before rating.
@@ -57,8 +57,28 @@ other testers. Nobody without an invitation can see the site.
   fastest path.
 
 ## Steve's record
-- Started:
-- Branch / PR:
-- Development log entry:
-- Verification:
+- Started: 2026-11-17
+- Branch / PR: `prototype/supabase` (created from `collab/main`; `collab/main` fast-forwarded to it). No PR yet (none requested for P0).
+- Development log entry: "2026-11-17: ORD-0004 P0, Supabase prototype setup checklist for M"
+- Verification: P0 is documentation only. Supabase, Google Cloud, Cloudflare Pages and Claude
+  settings steps were checked against the official documentation listed at the end of the
+  checklist (fetched 2026-11-17); screens themselves could not be seen. The npm registry block was
+  re-confirmed (`npm view react` → ENOTFOUND; proxy CONNECT → 403).
+- **P0 delivered 2026-11-17:** `docs/setup/prototype-supabase-setup.md` (Parts A–I: Supabase project,
+  Google sign-in, email code template, redirect URLs, sign-ups off, tester invites, Cloudflare
+  previews and variables, values to send, workspace network access).
 - Deviations and notes:
+  - `VITE_SUPABASE_ANON_KEY` will hold Supabase's **publishable** key (`sb_publishable_...`):
+    Supabase's documentation says the legacy anon/service_role keys are deprecated by the end of
+    2026. The variable name is kept as specified.
+  - Supabase's built-in email only reaches members of the Supabase team, 2 emails per hour. Testers
+    sign in with Google until a custom SMTP provider is chosen; Steve will propose a free one for
+    M's approval (no paid service without approval).
+  - Invite-only (P1 plan): sign-ups off now; in P1 an `invited_emails` table plus a "Before User
+    Created" auth hook (Postgres function) refuses any email not on the list. Free-plan
+    availability of the hook is unverified; fallback is sign-ups off with accounts created in
+    advance.
+  - Preview builds need `prototype/supabase` in M's fork `mcoscarelli/the-media-lens`; Steve will
+    ask M before attaching the fork.
+  - Blocker for P1 onwards: the workspace cannot reach the npm registry; M must enable network
+    access (checklist Part I) and continue in a new chat.
