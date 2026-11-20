@@ -28,6 +28,291 @@ The permanent chronological record of how The Media Lens was built.
 
 ---
 
+## 2026-11-17: ORD-0004 P0, Supabase prototype setup checklist for M
+
+**Status:** Completed (documentation only)
+**Task / objective:** Milestone P0 of ORD-0004: a plain-language checklist M can follow in about 30
+minutes to create the Supabase project, Google sign-in, the settings Steve needs, and to allow
+package installs in the Claude workspace, before any prototype code is written.
+**Implementation:** Wrote `docs/setup/prototype-supabase-setup.md` (Parts A–I: Supabase account and
+US project; Google Auth Platform client and Supabase Google provider; email code template;
+Site URL and redirect URLs for vulgis.com, the pages.dev address, branch previews and localhost;
+sign-ups switched off until the invite list exists; how testers will be invited; Cloudflare Pages
+preview addresses and Preview-only variables `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`; which
+values to send Steve and which secrets never leave Supabase/Google/M's password manager; Claude
+network access). Each step was checked against current official documentation (sources listed in
+the file), with unverified screen labels marked. Updated ORD-0004's record and status, the order
+index, `CLAUDE.md` §4 (new `docs/setup/` folder) and Steve's memory.
+**Technical explanation:** No code changed.
+**Decision (if any):** Planned for P1 and recorded in the order: `VITE_SUPABASE_ANON_KEY` holds the
+new **publishable** key, because Supabase deprecates the legacy anon key by the end of 2026;
+invite-only via an `invited_emails` table and a "Before User Created" auth hook (fallback: sign-ups
+off, accounts created in advance); testers use Google sign-in because Supabase's built-in email
+reaches only project team members (2 emails/hour) until a custom SMTP provider is approved.
+**Files:** Created `docs/setup/prototype-supabase-setup.md`. Modified
+`docs/team/orders/ORD-0004-supabase-working-prototype.md`, `docs/team/orders/README.md`,
+`docs/team/steve/memory.md`, `CLAUDE.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only). Re-checked the environment blocker:
+`npm view react version` fails with ENOTFOUND for `registry.npmjs.org`, and a request through the
+session proxy is refused (CONNECT 403).
+**Limitations, open issues and follow-up:** Screen labels in Supabase, Google Cloud, Cloudflare and
+Claude settings were taken from documentation, not seen (listed at the end of the checklist).
+Free-plan availability of the "Before User Created" hook is unverified. P1 cannot be built or
+verified until M enables package installs and continues in a new chat.
+
+---
+
+## 2026-11-17: Issue ORD-0004 (working prototype on Supabase); record Ground News research
+
+**Status:** Completed (documentation only)
+**Task / objective:** M approved building a small working prototype before the full AWS build.
+**Implementation:** Created ORD-0004 with milestones P0–P3 (setup checklist, login gate, accounts
+and two-question ratings, real US headlines); updated the order index and Walter's memory (decision,
+Q12 resolved, Q13 competitor note on Ground News).
+**Technical explanation:** No code changed.
+**Files:** Created `docs/team/orders/ORD-0004-supabase-working-prototype.md`. Modified
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only). Checked that this workspace cannot
+reach the npm registry (`npm view` fails), which blocks building and testing.
+**Limitations, open issues and follow-up:** Package installs must be allowed before Steve can build
+and verify the prototype here.
+
+---
+
+## 2026-11-16: Walter records the prototype-first question (Q12)
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's request for a working prototype before a full AWS build, and
+Walter's recommendation.
+**Implementation:** Updated `docs/team/walter/memory.md` (Q12, session log).
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** No order issued yet; awaiting M's go-ahead.
+
+---
+
+## 2026-11-16: Record M's decisions on rating timing, sign-up and the login gate
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record in Walter's memory M's decisions: rate the headline blind before
+opening (Q10); easy sign-up that minimizes bots (Q9); keep the demo public until Steve's login is
+built. Note the questions Steve's proposal raised for Walter (Q11).
+**Implementation:** Updated `docs/team/walter/memory.md`. `collab/main` fast-forwarded to
+`order/0002-0003-architecture` so the memory reflects Steve's proposal.
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** Steve's proposals await M's and Daniel's approval.
+
+---
+
+## 2026-11-16: Architecture proposal for accounts, database, headline ingestion and admin (ORD-0002, ORD-0003)
+
+**Status:** Proposed (not implemented). Documentation only; no code changed, nothing built or provisioned.
+**Task / objective:** Steve's proposals for ORD-0002 (accounts, login, profiles, database, headline
+ingestion on AWS) and ORD-0003 (admin interface), within M's decisions: US only, AWS, headlines plus
+a link to the source, an admin interface; and, decided during the work, headline-first blind rating
+(Q10), low-friction layered account integrity (Q9), and a login gate as the first milestone.
+**Implementation:** Wrote nine ADRs (0001–0009, all `Proposed`), the proposed target architecture
+in `docs/architecture/README.md` (components, draft data model, scale path at 1k/100k/1M MAU,
+monthly AWS cost estimates with assumptions and sources, phased build plan), an admin screen
+list, and a US privacy and legal checklist. Updated both orders, the order index, Steve's memory
+and the `CLAUDE.md` structure tree.
+**Technical explanation:** Proposed stack: S3 + CloudFront (with WAF) on one domain; API Gateway
+HTTP API + Lambda (Node.js, Arm); Cognito Essentials (Google, Apple, email one-time code,
+passkeys); Aurora PostgreSQL Serverless v2 with demographics in a separate schema and database
+roles that stop admins editing ratings; RSS ingestion through EventBridge Scheduler, Lambda and
+SQS with embedding-based event grouping; a separate admin app, API and staff user pool with
+required MFA and an append-only audit log. The API returns only two article shapes (sealed and
+revealed) chosen by a server-side `visibilityFor()`, with a contract test for leaks. Ratings carry
+`basis`, `opened_before_rating` and an optional prediction (PROP-0001).
+**Decision (if any):** None accepted; every ADR awaits M's and Daniel's approval. Recommended
+choices and alternatives are recorded in each ADR.
+**Files:** Created `docs/architecture/adr/0001-aws-as-cloud.md`, `0002-authentication-and-login.md`,
+`0003-account-integrity.md`, `0004-database.md`, `0005-api-layer.md`,
+`0006-frontend-hosting-and-api-migration.md`, `0007-headline-ingestion.md`,
+`0008-rating-flow-and-reading-at-source.md`, `0009-admin-interface.md`,
+`docs/architecture/admin-interface.md`, `docs/privacy/us-privacy-and-legal-requirements.md`.
+Modified `docs/architecture/README.md`, `docs/architecture/adr/README.md`,
+`docs/team/orders/ORD-0002-accounts-and-database-architecture.md`,
+`docs/team/orders/ORD-0003-admin-interface.md`, `docs/team/orders/README.md`,
+`docs/team/steve/memory.md`, `CLAUDE.md` (§4 tree only), `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only). Cost totals re-added by hand. AWS
+prices looked up on 2026-11-16: Cognito, API Gateway, CloudFront and WAF from AWS's pages; Lambda,
+Aurora and SES from dated third-party summaries because the official pages could not be fetched.
+RDS Proxy, ElastiCache, CloudWatch and other items are unpriced allowances.
+**Limitations, open issues and follow-up:** Cost figures are estimates based on assumed usage.
+Legal items need a lawyer (flagged in the checklist). Proposed next step: on approval, a build
+order for milestone M1 (login gate, estimated 1–2 weeks).
+
+---
+
+## 2026-11-16: Record US focus, AWS and headlines-first decisions; issue ORD-0003 (admin interface)
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's decisions (US market and news, AWS, v1 with headlines plus a link
+to the source, an admin interface) and hand them to Steve.
+**Implementation:** Updated ORD-0002's scope, issued ORD-0003 (admin interface design proposal),
+updated the order index and Walter's memory.
+**Technical explanation:** No code changed.
+**Files:** Created `docs/team/orders/ORD-0003-admin-interface.md`. Modified
+`docs/team/orders/ORD-0002-accounts-and-database-architecture.md`, `docs/team/orders/README.md`,
+`docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** These decisions are M's; `CLAUDE.md` is unchanged until
+Daniel agrees. Open question Q10 (rate the headline before or after reading at the source).
+
+---
+
+## 2026-11-16: Issue ORD-0002 (accounts and database architecture); record news-licensing research
+
+**Status:** Completed (documentation only)
+**Task / objective:** M asked to start the infrastructure for real users and to understand what
+Vulgis may use from news outlets.
+**Implementation:** Issued ORD-0002 (an architecture proposal for accounts, login, profiles and the
+database; nothing is built until M and Daniel approve). Recorded Walter's legal research summary
+(Q6), the account-integrity question (Q9) and the decisions in Walter's memory.
+**Technical explanation:** No code changed.
+**Files:** Created `docs/team/orders/ORD-0002-accounts-and-database-architecture.md`. Modified
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** The legal summary is research, not legal advice; a
+media/IP lawyer is needed before real articles are shown.
+
+---
+
+## 2026-11-16: Walter writes PROP-0001 (Insight rank) for approval
+
+**Status:** Completed (documentation only; the proposal is not approved or implemented)
+**Task / objective:** M asked Walter to write a proposal for M and Daniel to approve: replace Crowd
+Alignment with an Insight rank based on an honest rating plus a prediction, crowd only, with a
+separate Forecast badge.
+**Implementation:** Added the repository copy of the proposal and recorded M's decision and the
+proposal in Walter's memory. A working copy for comments was created as a claude.ai doc.
+**Technical explanation:** No code changed. The proposal specifies the scoring (Bayesian Truth Serum
+information score on a yes/no split at 50), the outputs, principle changes, risks and a rollout plan.
+**Files:** Created `docs/team/proposals/PROP-0001-insight-rank.md`. Modified
+`docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Worked-example arithmetic checked by hand. No simulation of the new method
+has been run yet; the proposal lists that as rollout step 2.
+**Limitations, open issues and follow-up:** Needs approval from both partners before any order is
+issued. `CLAUDE.md` is unchanged until then.
+
+---
+
+## 2026-11-16: Record the two-question decision and prediction design notes
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's acceptance of two questions per article and Walter's answer on
+readers projecting their own rating onto the crowd.
+**Implementation:** Updated `docs/team/walter/memory.md` (decision register, Q8 design notes,
+session log).
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** Whether accurate predictions count toward the rank is
+undecided. Daniel has not yet agreed to the change of what the rank measures.
+
+---
+
+## 2026-11-16: Pause ORD-0001; record the crowd-only principle
+
+**Status:** Completed (documentation only)
+**Task / objective:** M paused ORD-0001 and decided Vulgis relies on the crowd alone (no
+platform-produced calibration content, expert panels or outside verdicts).
+**Implementation:** ORD-0001 status set to `On hold`; `On hold` added to the order status table;
+Walter's memory updated (decision register, Q8 revised recommendation, session log).
+**Technical explanation:** No code changed.
+**Files:** Modified `docs/team/orders/ORD-0001-two-factor-crowd-alignment.md`,
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** `CLAUDE.md` is unchanged until Daniel agrees, since
+the crowd-only principle and the rank's purpose affect §1.
+
+---
+
+## 2026-11-16: Walter session on what the reader rank should measure
+
+**Status:** Completed (documentation only)
+**Task / objective:** Record M's position that the rank should reward good judgment of an article's
+neutrality and factuality, not anticipation of the crowd, and Walter's analysis of how to measure it.
+**Implementation:** Updated `docs/team/walter/memory.md`: decision register (M's position, not yet
+agreed with Daniel), new open question Q8 with options and a recommendation (calibration articles),
+session log.
+**Technical explanation:** No code changed. ORD-0001 is unchanged; Walter recommends pausing it
+pending M's answer.
+**Files:** Modified `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** M's position reverses Daniel's 2026-11-12 decision
+(`CLAUDE.md` §1.4), so `CLAUDE.md` is not changed until both partners agree.
+
+---
+
+## 2026-11-16: Walter session on herding; issue ORD-0001 (two-factor Crowd Alignment)
+
+**Status:** Completed (documentation only; the order itself is not implemented yet)
+**Task / objective:** Record M's decision to implement a two-factor Crowd Alignment (accuracy +
+ordering) and hand it to Steve as a development order. Record Walter's analysis of whether it also
+addresses herding.
+**Implementation:** Created the first development order and updated Walter's memory (decision
+register, assumptions A5–A6, open questions Q2 and Q4, orders issued, session log) and the order index.
+**Technical explanation:** No code changed. ORD-0001 specifies the ordering measure (pairwise order
+agreement with ties counted as half), small-sample shrinkage, a standardized combination with
+accuracy, and testable acceptance criteria, including constant-answer readers ranking below the 10th
+percentile.
+**Decision:** M decided to implement the two-factor rank (2026-11-16). It needs Daniel's approval to
+merge because it changes what the rank means (`CLAUDE.md` §1.4, §9).
+**Files:** Created `docs/team/orders/ORD-0001-two-factor-crowd-alignment.md`. Modified
+`docs/team/orders/README.md`, `docs/team/walter/memory.md`, `DEVELOPMENT_LOG.md`.
+**Testing and results:** Not applicable (documentation only).
+**Limitations, open issues and follow-up:** Walter's view is that the two-factor rank fixes hedging
+but not herding; a phase-2 "predict the crowd" question is proposed in Q2 and not yet decided.
+
+---
+
+## 2026-11-16: Add the Walter (strategy) and Steve (development) agents with permanent memory
+
+**Status:** Completed
+**Task / objective:** M asked for two agents to support development on M's side of the partnership:
+**Walter**, a senior business strategist who questions assumptions and develops the business model,
+incentives and dynamics (legal form, for-profit or not, still undecided), and **Steve**, a developer
+who takes development orders from Walter, documents at corporate standards and builds toward a
+platform for millions of users on AWS or Azure, optimized for desktop and mobile. Both need
+permanent memory.
+**Implementation:** Added two agent definitions, one memory file per agent, a development-order
+system for the Walter → Steve hand-off, and an architecture folder for ADRs. Updated `CLAUDE.md`
+§4 and §11 to describe them. No application code changed.
+**Technical explanation:** Claude Code loads agent definitions from `.claude/agents/*.md` (YAML
+front matter with `name`, `description`, `model`, then the instructions). Agents cannot call each
+other, so Walter writes orders as files in `docs/team/orders/` and Steve reads them; each order
+carries a status, acceptance criteria and Steve's record of the work. "Permanent memory" is a
+Markdown file per agent that the agent reads at the start of a session and updates, commits and
+pushes at the end, because the cloud workspace is wiped between sessions. Walter's memory was
+seeded with the mission, the decision history from `CLAUDE.md` and this log, an assumptions
+register and seven open questions; Steve's with the current technical state, deployment setup and
+environment quirks.
+**Decision:** Steve works alongside Daniel's `media-lens-developer` agent and follows its rules
+rather than replacing it (M's choice, 2026-11-16). The agents live in this repository, delivered by
+pull request for Daniel's approval, rather than only in M's fork (M's choice), so they load in any
+session on the project and Daniel can see decisions and orders. Alternatives: account-level skills
+(not tied to the repo and unable to hold memory) and fork-only files (would drift from Daniel's repo).
+**Files:**
+- Created: `.claude/agents/walter.md`, `.claude/agents/steve.md`, `docs/team/README.md`,
+  `docs/team/walter/memory.md`, `docs/team/steve/memory.md`, `docs/team/orders/README.md`,
+  `docs/architecture/README.md`, `docs/architecture/adr/README.md`
+- Modified: `CLAUDE.md` (§4 project structure, §11 records table), `DEVELOPMENT_LOG.md` (this entry)
+**Testing and results:** Documentation-only change. Checked that both agent files have valid front
+matter (`name`, `description`, `model`) in the same format as `media-lens-developer.md`. Did not run
+`npm test` or the build because no code changed. Did not invoke the agents in a new session; they
+load when a session starts on a checkout that contains them.
+**Limitations, open issues and follow-up:** Memory persists only when the agents commit and push.
+Two people working the same memory file in parallel could produce merge conflicts. Walter's open
+question Q2 (whether ranking by agreement with the crowd encourages herding) and Q4 (re-running
+the hedging proposal on the 1–100 slider) are proposed next topics.
+
+---
+
 ## 2026-11-15: Slider rating (1–100), single colored scores, and removal of sourcing and framing analysis
 
 - **Date:** 2026-11-15
